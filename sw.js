@@ -1,11 +1,11 @@
 const CACHE_NAME = 'db-desaparecidos-v1';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/js/github_db.js',
-  '/js/robou.js',
-  '/js/ia_ponte.js'
+  './',
+  './index.html',
+  './manifest.json',
+  './js/github_db.js',
+  './js/robou.js',
+  './js/ia_ponte.js'
 ];
 
 // Instalação
@@ -27,8 +27,13 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch: Prioridade para o cache, depois rede
+// Fetch: Prioridade para o cache, depois rede (Ignorando APIs)
 self.addEventListener('fetch', event => {
+  // CORREÇÃO: Não deixa o cache se meter nas requisições do GitHub e da IA
+  if (event.request.url.includes("://github.com") || event.request.url.includes("hf.space")) {
+    return; // Deixa passar direto para a internet
+  }
+
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request);
