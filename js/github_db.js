@@ -103,3 +103,15 @@ async function sincronizarAppComNuvem() {
 document.addEventListener("DOMContentLoaded", () => {
     sincronizarAppComNuvem();
 });
+
+// =================================================================
+// 4. REGISTRO AUTOMÁTICO DO APP (PWA) NO CELULAR DOS USUÁRIOS
+// =================================================================
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        // Como o script está na pasta /js/, voltamos um nível com "../" para ler o sw.js na raiz
+        navigator.serviceWorker.register("../sw.js")
+            .then((reg) => console.log("🤖 Aplicativo DIAMANTE BLACK registrado com sucesso!", reg.scope))
+            .catch((erro) => console.error("❌ Erro ao registrar aplicativo no celular:", erro));
+    });
+}
