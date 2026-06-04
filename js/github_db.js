@@ -38,7 +38,7 @@ async function salvarDadosNoGitHub(novaFicha) {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                message: `🕵️‍♀️ Detetive atualizou registros de forma segura`,
+                message: `🕵️‍♀️ Detetive updated records securely`,
                 content: conteudoBase64,
                 sha: sha
             })
@@ -82,7 +82,7 @@ async function puxarBancoDoGitHub() {
     }
 }
 
-// 3. SINCRONIZADOR INICIAL
+// 3. SINCRONIZADOR INICIAL (Ajustado para chamar o Mural do robô)
 async function sincronizarAppComNuvem() {
     const { dadosAtuais } = await puxarBancoDoGitHub();
     
@@ -90,7 +90,11 @@ async function sincronizarAppComNuvem() {
         if (typeof listaFotosDesaparecidos !== 'undefined') {
             listaFotosDesaparecidos = dadosAtuais;
         }
-        if (typeof desenharPainelFotos === 'function') {
+        
+        // CORREÇÃO: Chama a função de desenho do robô para colocar as fotos na tela
+        if (typeof renderizarMural === 'function') {
+            renderizarMural();
+        } else if (typeof desenharPainelFotos === 'function') {
             desenharPainelFotos();
         }
     }
