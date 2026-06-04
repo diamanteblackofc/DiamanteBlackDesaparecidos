@@ -16,7 +16,7 @@ document.addEventListener('novoCadastro', async (e) => {
             nome: dados.nome,
             idade: dados.idade || "Não informada",
             cidade: dados.cidade,
-            descricao: dados.desc || "Sem detalhes adicionais.",
+            desc: dados.desc || "Sem detalhes adicionais.", // CORRIGIDO: de descricao para desc
             whatsapp: dados.whats,
             status: "Procurando"
         };
@@ -57,25 +57,32 @@ function renderizarMural() {
         `;
         mural.insertAdjacentHTML("beforeend", cardHTML);
     });
+
+    // CORREÇÃO EXTRAS: Força o sumiço dos quadradinhos de carregamento (skeletons) do index
+    const skeletons = mural.querySelectorAll('.skeleton-card');
+    skeletons.forEach(s => s.remove());
 }
 
-// 3. ABRE DETALHE (CONECTADO AO MODAL DO INDEX)
+// 3. ABRE DETALHE (CONECTADO AO MODAL DO INDEX) - TOTALMENTE ADAPTADO
 function abrirDetalhePorId(id) {
     const registro = listaFotosDesaparecidos.find(p => p.id === id);
     if (!registro) return;
 
-    // Usa a estrutura de abrirDetalhe que você já tem no HTML
+    // Executa a função original do index (ela vai processar o desc corretamente agora)
     abrirDetalhe({
         foto: registro.fotoBase64,
         nome: registro.nome,
         cidade: registro.cidade,
         idade: registro.idade,
-        desc: registro.descricao,
+        desc: registro.desc, // Mudado para desc
         whats: registro.whatsapp
     });
-    
-    // Opcional: Adicionar o botão de Achado aqui via JS se quiser, 
-    // mas a lógica principal está pronta.
+
+    // GAMBIARRA DE SEGURANÇA: Corrige o bug de texto do index.html direto na tela por fora
+    const txtMeta = document.getElementById('detalhe-meta-txt');
+    if (txtMeta) {
+        txtMeta.textContent = `${registro.cidade}${registro.idade ? ' · ' + registro.idade + ' anos' : ''}`;
+    }
 }
 
 // 4. LÓGICA DE SUCESSO
