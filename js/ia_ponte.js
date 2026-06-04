@@ -5,10 +5,10 @@ const CONFIG_IA = {
 };
 
 // =================================================================
-// RECEBE O SINAL DO INDEX.HTML (O BOTÃO "🌐 IA")
+// RECEBE O SINAL DO INDEX.HTML (QUANDO CLICA NA LUNETA 🔍)
 // =================================================================
 document.addEventListener('buscaAvancada', async (e) => {
-    const fraseUsuario = e.detail.query; // Pega a query enviada pelo index.html
+    const fraseUsuario = e.detail.query; // Pega o texto digitado na barra
     const token = e.detail.token;       // Pega o token configurado no Admin
     
     await processarBuscaInteligente(fraseUsuario, token);
@@ -37,9 +37,9 @@ async function processarBuscaInteligente(fraseUsuario, token) {
         if (!respostaIA.ok) throw new Error("Falha na resposta do Space");
         
         const resultadoGradio = await respostaIA.json();
-        let dadosFiltrados = JSON.parse(resultadoGradio.data[0]);
+        let dadosFiltrados = JSON.parse(resultadoGradio.data);
 
-        renderizarFotosFiltradasIA(dadosFiltrados, true); // true ativa o botão de voltar
+        renderizarFotosFiltradasIA(dadosFiltrados, true);
 
     } catch (erro) {
         console.error("Erro na busca IA, usando busca local reserva:", erro);
@@ -53,7 +53,7 @@ async function processarBuscaInteligente(fraseUsuario, token) {
             return cidade.includes(busca) || nome.includes(busca) || desc.includes(busca);
         });
         
-        renderizarFotosFiltradasIA(fallbackLocal, true); // true ativa o botão de voltar
+        renderizarFotosFiltradasIA(fallbackLocal, true);
     }
 }
 
@@ -63,6 +63,10 @@ async function processarBuscaInteligente(fraseUsuario, token) {
 function renderizarFotosFiltradasIA(listaFiltrada, exibirBotaoVoltar = false) {
     const mural = document.getElementById("mural");
     if (!mural) return;
+
+    // NOVO: Remove qualquer botão de limpar busca antigo antes de criar um novo
+    const botaoAntigo = document.getElementById("container-limpar-busca");
+    if (botaoAntigo) botaoAntigo.remove();
 
     // 1. Limpa o mural completamente
     mural.innerHTML = '';
@@ -86,7 +90,6 @@ function renderizarFotosFiltradasIA(listaFiltrada, exibirBotaoVoltar = false) {
                 </button>
             </div>
         `;
-        // Coloca o botão imediatamente antes do grid de fotos começar
         mural.insertAdjacentHTML("beforebegin", botaoHTML);
     }
 
@@ -119,11 +122,9 @@ function renderizarFotosFiltradasIA(listaFiltrada, exibirBotaoVoltar = false) {
 // FUNÇÃO DE RESTAURAÇÃO (Volta para o mural original completo)
 // =================================================================
 function restaurarMuralCompleto() {
-    // Remove o botão de limpar busca da tela para não ficar duplicando
     const botaoExistente = document.getElementById("container-limpar-busca");
     if (botaoExistente) botaoExistente.remove();
 
-    // Chama a função original do robou.js que desenha o mural original com todas as fotos
     if (typeof renderizarMural === 'function') {
         renderizarMural();
         console.log("🤖 Mural completo restaurado pelo Robô!");
