@@ -2,7 +2,7 @@
   "name": "DIAMANTE BLACK RASTREADOR",
   "short_name": "DB Rastreador",
   "description": "Plataforma de busca colaborativa de desaparecidos.",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0a0a12",
   "theme_color": "#0a0a12",
@@ -12,7 +12,13 @@
       "src": "imagens/icone-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "imagens/icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "imagens/icone-512.png",
