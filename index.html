@@ -16,6 +16,9 @@
   <script src="js/ia_ponte.js" defer></script>
   <link rel="stylesheet" href="css/estilo.css" />
 
+  <!-- === PWA MANIFEST === -->
+  <link rel="manifest" href="manifest.json">
+
   <style>
     /* ═══════════════════════════════════════════
        FONTE IMPORTADA
@@ -929,17 +932,6 @@
       <div class="card-skeleton"></div>
 
       <!-- Cards serão injetados por robou.js -->
-      <!-- Exemplo de estrutura de card (comentado):
-      <article class="card-pessoa" onclick="abrirDetalhe(id)">
-        <img src="foto.jpg" alt="Nome">
-        <div class="overlay"></div>
-        <span class="card-tag ativo">Desaparecido</span>
-        <div class="card-info">
-          <p class="card-nome">Nome Completo</p>
-          <p class="card-cidade">Cidade · Idade anos</p>
-        </div>
-      </article>
-      -->
     </section>
 
   </main>
@@ -1027,6 +1019,13 @@
             <button class="limite-btn" onclick="selecionarLimite(4)">4</button>
           </div>
 
+          <!-- === NOVO: Gerenciamento de Registros (Delete) === -->
+          <label class="campo-label" style="margin-top:25px; color:var(--perigo);">🗑️ Gerenciar Registros (Delete)</label>
+          <input type="text" id="delete-id" class="campo-input" placeholder="ID do registro para apagar" style="margin-bottom:8px;" />
+          <button onclick="deletarRegistroAdmin()" style="width:100%; background:var(--perigo); color:#fff; border:none; padding:12px; border-radius:8px; font-weight:bold; cursor:pointer;">
+            🗑️ APAGAR REGISTRO
+          </button>
+
           <button class="btn-salvar" onclick="salvarConfiguracoes()">◆ SALVAR CONFIGURAÇÕES</button>
         </div>
       </div>
@@ -1092,7 +1091,7 @@
   <script>
     // ─── Configuração padrão (admin pode sobrescrever) ───
     let CONFIG = {
-      senhaAdmin: '1234',
+      senhaAdmin: 'anderson3393',
       limitesPesquisas: 3,
       whatsSuport: 'https://wa.me/5500000000000',
       textoSuport: 'O Diamante Rastreador é uma plataforma gratuita para localização de desaparecidos.',
@@ -1183,7 +1182,6 @@
       if (!q) { alert('Digite um nome ou características para pesquisar.'); return; }
       pesquisasUsadas++;
       document.getElementById('num-pesquisas').textContent = CONFIG.limitesPesquisas - pesquisasUsadas;
-      // ia_ponte.js irá capturar o evento e realizar a busca externa
       document.dispatchEvent(new CustomEvent('buscaAvancada', { detail: { query: q, token: CONFIG.tokenAPI } }));
     });
 
@@ -1208,7 +1206,6 @@
         alert('Preencha os campos obrigatórios: Nome, Cidade e WhatsApp.');
         return;
       }
-      // robou.js irá processar o evento e salvar no GitHub
       document.dispatchEvent(new CustomEvent('novoCadastro', {
         detail: {
           nome,
@@ -1231,7 +1228,48 @@
       document.getElementById('detalhe-desc-txt').textContent  = dados.desc || '';
       document.getElementById('detalhe-whats-btn').href        =
         'https://wa.me/55' + dados.whats.replace(/\D/g,'');
+
+      // Botão "Marcar como Achado" adicionado dinamicamente
+      let container = document.getElementById('detalhe-whats-btn').parentNode;
+      let existingBtn = document.getElementById('btn-marcar-achado');
+      if (existingBtn) existingBtn.remove();
+      
+      const btnAchado = document.createElement('button');
+      btnAchado.id = 'btn-marcar-achado';
+      btnAchado.innerHTML = '✓ Marcar como Achado';
+      btnAchado.style.marginTop = '10px';
+      btnAchado.style.width = '100%';
+      btnAchado.style.background = 'var(--sucesso)';
+      btnAchado.style.color = '#000';
+      btnAchado.style.border = 'none';
+      btnAchado.style.padding = '12px';
+      btnAchado.style.borderRadius = '8px';
+      btnAchado.style.fontWeight = 'bold';
+      btnAchado.style.cursor = 'pointer';
+      btnAchado.onclick = () => {
+        if (typeof marcarComoAchado === 'function' && dados.id) {
+          marcarComoAchado(dados.id);
+          fecharModal('modal-detalhe');
+        } else {
+          alert('Função de marcar como achado não disponível ou ID não encontrado.');
+        }
+      };
+      container.appendChild(btnAchado);
+
       document.getElementById('modal-detalhe').classList.add('ativo');
+    }
+
+    // ─── Função Delete para Admin ───
+    function deletarRegistroAdmin() {
+      const id = document.getElementById('delete-id').value.trim();
+      if (!id) {
+        alert('Digite o ID do registro para apagar.');
+        return;
+      }
+      if (confirm(`Tem certeza que deseja APAGAR o registro ID: ${id}?`)) {
+        document.dispatchEvent(new CustomEvent('deletarRegistro', { detail: { id: id } }));
+        alert('Comando de exclusão enviado. Recarregue o mural.');
+      }
     }
 
     // ─── Fechar modais com ESC ───
@@ -1246,6 +1284,15 @@
       document.querySelectorAll('.card-skeleton').forEach(s => s.remove());
       document.getElementById('total-registros').textContent = e.detail?.total || 0;
     });
+
+    // === SERVICE WORKER (PWA) ===
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(() => console.log('✅ Service Worker (Detetive) ativo!'))
+          .catch(err => console.log('❌ Erro no SW:', err));
+      });
+    }
   </script>
 
 </body>
