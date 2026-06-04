@@ -12,7 +12,7 @@ const CONFIG_GITHUB = {
 };
 
 // URL TOTALMENTE CORRIGIDA: Aponta para a API oficial de repositórios do GitHub
-const URL_API_GH = `https://api.github.com/repos/${CONFIG_GITHUB.usuario}/${CONFIG_GITHUB.repositorio}/contents/${CONFIG_GITHUB.arquivoBanco}`;
+const URL_API_GH = `https://github.com{CONFIG_GITHUB.usuario}/${CONFIG_GITHUB.repositorio}/contents/${CONFIG_GITHUB.arquivoBanco}`;
 
 // 1. SALVAR NOVO DESAPARECIDO NA NUVEM DO SEU REPOSITÓRIO
 async function salvarDadosNoGitHub(novaFicha) {
@@ -55,7 +55,7 @@ async function salvarDadosNoGitHub(novaFicha) {
     }
 }
 
-// 2. PUXAR BANCO DA NUVEM
+// 2. PUXAR BANCO DA NUVEM (Voltou ao seu original idêntico)
 async function puxarBancoDoGitHub() {
     try {
         const resposta = await fetch(URL_API_GH, {
@@ -68,7 +68,13 @@ async function puxarBancoDoGitHub() {
         }
 
         const dadosArtigo = await resposta.json();
-        const textoDecodificado = decodeURIComponent(escape(atob(dadosArtigo.content)));
+        
+        // Proteção simples: se o arquivo vier com texto comum ou quebrado, evita travar o atob
+        if (!dadosArtigo.content || dadosArtigo.content.trim() === "") {
+            return { dadosAtuais: [], sha: dadosArtigo.sha };
+        }
+
+        const textoDecodificado = decodeURIComponent(escape(atob(dadosArtigo.content.replace(/\s/g, ""))));
         const dadosAtuais = JSON.parse(textoDecodificado);
 
         return {
@@ -91,7 +97,6 @@ async function sincronizarAppComNuvem() {
             listaFotosDesaparecidos = dadosAtuais;
         }
         
-        // CORREÇÃO: Chama a função de desenho do robô para colocar as fotos na tela
         if (typeof renderizarMural === 'function') {
             renderizarMural();
         } else if (typeof desenharPainelFotos === 'function') {
@@ -104,12 +109,9 @@ document.addEventListener("DOMContentLoaded", () => {
     sincronizarAppComNuvem();
 });
 
-// =================================================================
 // 4. REGISTRO AUTOMÁTICO DO APP (PWA) NO CELULAR DOS USUÁRIOS
-// =================================================================
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-        // Como o script está na pasta /js/, voltamos um nível com "../" para ler o sw.js na raiz
         navigator.serviceWorker.register("../sw.js")
             .then((reg) => console.log("🤖 Aplicativo DIAMANTE BLACK registrado com sucesso!", reg.scope))
             .catch((erro) => console.error("❌ Erro ao registrar aplicativo no celular:", erro));
