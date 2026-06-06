@@ -1,5 +1,3 @@
-Sw
-
 const CACHE_NAME = 'db-desaparecidos-v2'; // Versão atualizada para forçar limpeza do cache antigo
 const ASSETS = [
   './',
