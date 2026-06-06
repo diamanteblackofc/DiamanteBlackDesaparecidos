@@ -1,22 +1,23 @@
-const CACHE_NAME = 'db-desaparecidos-v1';
+Sw
+
+const CACHE_NAME = 'db-desaparecidos-v2'; // Versão atualizada para forçar limpeza do cache antigo
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './js/github_db.js',
   './js/robou.js',
-  './js/ia_ponte.js'
+  './js/ia_ponte.js',
+  './css/estilo.css' // ✅ ADICIONADO: Agora o CSS é cacheado para funcionar offline
 ];
 
-// Instalação
 self.addEventListener('install', event => {
-  self.skipWaiting(); // Garante que o novo SW assuma o controle imediatamente
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
 });
 
-// Ativação: LIMPEZA DE CACHE ANTIGO
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys => {
@@ -27,16 +28,32 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch: Prioridade para o cache, depois rede (Ignorando APIs)
 self.addEventListener('fetch', event => {
-  // CORREÇÃO: Não deixa o cache se meter nas requisições do GitHub e da IA
-  if (event.request.url.includes("://github.com") || event.request.url.includes("hf.space")) {
-    return; // Deixa passar direto para a internet
+  // Ignorar cache para requisições de API externas (GitHub, OpenRouter, HuggingFace)
+  if (event.request.url.includes("api.github.com") || 
+      event.request.url.includes("openrouter.ai") || 
+      event.request.url.includes("hf.space")) {
+    return;
   }
 
+  // Estratégia: Cache First, com fallback para rede
   event.respondWith(
     caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+      if (response) {
+        // Se estiver no cache, retorna, mas atualiza o cache em segundo plano (Stale-While-Revalidate)
+        const fetchPromise = fetch(event.request).then(networkResponse => {
+          if (networkResponse && networkResponse.status === 200) {
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, networkResponse.clone());
+            });
+          }
+          return networkResponse;
+        }).catch(() => response);
+        
+        return response;
+      }
+      // Se não estiver no cache, busca na rede
+      return fetch(event.request);
     })
   );
 });
