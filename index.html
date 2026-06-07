@@ -1272,13 +1272,26 @@
   
   <script>
     let CONFIG = {
-      limitesPesquisas: 3,      whatsSuport: 'https://wa.me/5500000000000',
+      limitesPesquisas: 3,
+      whatsSuport: 'https://wa.me/5500000000000',
       textoSuport: 'O Diamante Rastreador é uma plataforma gratuita para localização de desaparecidos.',
       textoDocs: '1. Cadastre apenas informações verídicas.\n2. Marque como Achado quando localizar.\n3. Em emergências, ligue 190.',
       openRouterKey: '',
       hfToken: '',
       urlHuggingFace: ''
     };
+
+    // ═══ CORREÇÃO: Carrega as chaves salvas do localStorage ao iniciar ═══
+    (function carregarChavesSalvas() {
+      const _orKey = localStorage.getItem('diamante_or_key');
+      if (_orKey) CONFIG.openRouterKey = atob(_orKey);
+
+      const _hfTok = localStorage.getItem('diamante_hf_token');
+      if (_hfTok) CONFIG.hfToken = atob(_hfTok);
+
+      const _hfUrl = localStorage.getItem('diamante_hf_url');
+      if (_hfUrl) CONFIG.urlHuggingFace = _hfUrl;
+    })();
     
     let pesquisasUsadas = 0;
     let limiteAdminSelecionado = 3;
@@ -1321,7 +1334,8 @@
         carregarCamposAdmin();
       } else {
         const el = document.getElementById('senha-admin');
-        el.style.borderColor = 'var(--perigo)';        el.value = '';
+        el.style.borderColor = 'var(--perigo)';
+        el.value = '';
         el.placeholder = 'Senha incorreta!';
         setTimeout(() => {
           el.style.borderColor='';
@@ -1334,10 +1348,17 @@
       document.getElementById('admin-whats').value = CONFIG.whatsSuport;
       document.getElementById('admin-texto-suporte').value = CONFIG.textoSuport;
       document.getElementById('admin-docs').value = CONFIG.textoDocs;
-      document.getElementById('admin-openrouter-key').value = CONFIG.openRouterKey;
-      document.getElementById('admin-hf-token').value = CONFIG.hfToken;
-      document.getElementById('admin-hf-url').value = CONFIG.urlHuggingFace;
-      
+
+      // ═══ CORREÇÃO: Carrega OpenRouter e HuggingFace do localStorage ═══
+      const orKey = localStorage.getItem('diamante_or_key');
+      if (orKey) document.getElementById('admin-openrouter-key').value = atob(orKey);
+
+      const hfTok = localStorage.getItem('diamante_hf_token');
+      if (hfTok) document.getElementById('admin-hf-token').value = atob(hfTok);
+
+      const hfUrl = localStorage.getItem('diamante_hf_url');
+      if (hfUrl) document.getElementById('admin-hf-url').value = hfUrl;
+
       const tokenSalvo = localStorage.getItem('diamante_github_token');
       if (tokenSalvo) {
         document.getElementById('admin-github-token').value = atob(tokenSalvo);
@@ -1361,6 +1382,11 @@
       CONFIG.hfToken = document.getElementById('admin-hf-token').value;
       CONFIG.urlHuggingFace = document.getElementById('admin-hf-url').value;
       CONFIG.limitesPesquisas = limiteAdminSelecionado;
+
+      // ═══ CORREÇÃO: Persiste OpenRouter e HuggingFace no localStorage ═══
+      if (CONFIG.openRouterKey) localStorage.setItem('diamante_or_key', btoa(CONFIG.openRouterKey));
+      if (CONFIG.hfToken) localStorage.setItem('diamante_hf_token', btoa(CONFIG.hfToken));
+      if (CONFIG.urlHuggingFace) localStorage.setItem('diamante_hf_url', CONFIG.urlHuggingFace);
       
       const tokenGitHub = document.getElementById('admin-github-token').value.trim();
       if (tokenGitHub) {
@@ -1370,7 +1396,8 @@
       if (typeof CONFIG_IA !== 'undefined') {
         CONFIG_IA.openRouterKey = CONFIG.openRouterKey;
         CONFIG_IA.hfToken = CONFIG.hfToken;
-        CONFIG_IA.urlHuggingFace = CONFIG.urlHuggingFace;      }
+        CONFIG_IA.urlHuggingFace = CONFIG.urlHuggingFace;
+      }
       
       document.getElementById('texto-suporte').textContent = CONFIG.textoSuport;
       document.getElementById('texto-docs').innerHTML = CONFIG.textoDocs.replace(/\n/g,'<br>');
@@ -1419,7 +1446,8 @@
       const q = document.getElementById('campo-busca').value.trim();
       if (!q) {
         alert('Digite algo para pesquisar.');
-        return;      }
+        return;
+      }
       
       pesquisasUsadas++;
       document.getElementById('num-pesquisas').textContent = CONFIG.limitesPesquisas - pesquisasUsadas;
@@ -1468,7 +1496,8 @@
           idade: document.getElementById('cad-idade').value,
           desc: document.getElementById('cad-desc').value,
           fotoEl: document.getElementById('input-foto')
-        }      }));
+        }
+      }));
       
       fecharModal('modal-cadastro');
       
@@ -1517,7 +1546,8 @@
         return;
       }
       
-      if (typeof marcarComoAchado === 'function') marcarComoAchado(_detalheAtualDados.id);    }
+      if (typeof marcarComoAchado === 'function') marcarComoAchado(_detalheAtualDados.id);
+    }
     
     function executarApagarPostagem() {
       if (!_detalheAtualDados?.id) {
@@ -1566,7 +1596,8 @@
         }
         
         statusEl.style.color = 'var(--sucesso)';
-        statusEl.textContent = `✅ ${dados.length} registros importados com sucesso!`;        
+        statusEl.textContent = `✅ ${dados.length} registros importados com sucesso!`;
+        
         document.dispatchEvent(new CustomEvent('muralCarregado', {
           detail: { total: dados.length }
         }));
