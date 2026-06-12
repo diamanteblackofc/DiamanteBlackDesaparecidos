@@ -1,5 +1,5 @@
 // =====================================================================
-// DIAMANTE BLACK RASTREADOR — robou.js v3.1 (Corrigido)
+// DIAMANTE BLACK RASTREADOR — robou.js v3.2 (Compartilhamento com Foto)
 // Motor do mural: cadastro, renderização, detalhes, status e delete
 // =====================================================================
 
@@ -225,8 +225,8 @@ async function apagarMinhaPostagem(id) {
   );
 }
 
-// ─── 7. COMPARTILHAR POSTAGEM ───
-function compartilharPostagem(dados) {
+// ─── 7. COMPARTILHAR POSTAGEM (COM FOTO REAL DO DESAPARECIDO) ───
+async function compartilharPostagem(dados) {
   let whatsNum = String(dados.whats || '').replace(/\D/g, '');
   if (!whatsNum.startsWith('55')) whatsNum = '55' + whatsNum;
   
@@ -238,14 +238,50 @@ function compartilharPostagem(dados) {
     `Se tiver informações, entre em contato:\n` +
     `https://wa.me/${whatsNum}`;
   
+  // 🔥 NOVO: Converte a foto Base64 em arquivo real para compartilhar
+  let arquivoParaCompartilhar = null;
+  const fotoBase64 = dados.foto || dados.fotoBase64;
+  
+  if (fotoBase64 && fotoBase64.startsWith('data:image')) {
+    try {      const base64Data = fotoBase64.split(',')[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'image/jpeg' });
+      const nomeArquivo = `${dados.nome.replace(/\s+/g, '_')}_desaparecido.jpg`;
+      arquivoParaCompartilhar = new File([blob], nomeArquivo, { type: 'image/jpeg' });
+    } catch (e) {
+      console.error("Erro ao converter foto para compartilhamento:", e);
+    }
+  }
+  
+  // Usa a Web Share API
   if (navigator.share) {
-    navigator.share({
-      title: `Pessoa Desaparecida — ${dados.nome}`,
-      text: texto,
-      url: window.location.href
-    }).catch(() => {});  } else {
+    try {
+      const shareData = {
+        title: `Pessoa Desaparecida — ${dados.nome}`,
+        text: texto
+      };
+      
+      // Se suportar arquivos E tivermos a foto, anexa a imagem
+      if (arquivoParaCompartilhar && navigator.canShare && navigator.canShare({ files: [arquivoParaCompartilhar] })) {
+        shareData.files = [arquivoParaCompartilhar];
+      } else {
+        // Fallback: manda o link do site
+        shareData.url = window.location.href;
+      }
+      
+      await navigator.share(shareData);
+    } catch (err) {
+      console.log("Compartilhamento cancelado ou falhou:", err);
+    }
+  } else {
+    // Fallback para navegadores antigos: copia o texto
     navigator.clipboard.writeText(texto)
-      .then(() => alert("📋 Copiado! Cole no WhatsApp ou redes sociais."))
+      .then(() => alert("📋 Texto copiado! Cole no WhatsApp.\n(Seu navegador não suporta envio direto de foto, mas o texto está pronto)."))
       .catch(() => {
         const urlWhats = `https://wa.me/?text=${encodeURIComponent(texto)}`;
         window.open(urlWhats, '_blank');
@@ -256,8 +292,7 @@ function compartilharPostagem(dados) {
 // ─── 8. BUSCA LOCAL (filtro enquanto digita) ───
 document.addEventListener('DOMContentLoaded', () => {
   const campoBusca = document.getElementById('campo-busca');
-  if (campoBusca) {
-    campoBusca.addEventListener('input', () => {
+  if (campoBusca) {    campoBusca.addEventListener('input', () => {
       const termo = campoBusca.value.trim().toLowerCase();
       if (!termo) {
         renderizarMural();
@@ -292,7 +327,8 @@ function renderizarFotosFiltradasIA(listaFiltrada, exibirBotaoVoltar = true) {
         </button>
       </div>`;
     mural.insertAdjacentHTML("afterbegin", botaoHTML);
-  }  
+  }
+  
   if (!listaFiltrada || listaFiltrada.length === 0) {
     mural.innerHTML += `
       <div id="mural-vazio" style="grid-column:1/-1;text-align:center;padding:40px 20px;">
@@ -305,8 +341,7 @@ function renderizarFotosFiltradasIA(listaFiltrada, exibirBotaoVoltar = true) {
   listaFiltrada.forEach(item => {
     const classeTag = item.status === "Achado" ? "achado" : "ativo";
     const textoTag = item.status === "Achado" ? "Achado 🎉" : "Desaparecido";
-    
-    const card = document.createElement('article');
+        const card = document.createElement('article');
     card.className = 'card-pessoa';
     card.setAttribute('data-id', item.id);
     card.onclick = () => abrirDetalhePorId(item.id);
@@ -341,7 +376,8 @@ function mostrarToast(msg, tipo = "info") {
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'diamante-toast';
-    toast.style.cssText = `      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+    toast.style.cssText = `
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
       background:#0f0f1a; border:1px solid; border-radius:10px;
       padding:12px 22px; font-family:'Rajdhani',sans-serif;
       font-size:14px; font-weight:600; letter-spacing:0.5px;
@@ -354,8 +390,7 @@ function mostrarToast(msg, tipo = "info") {
   toast.style.color = cores[tipo] || cores.info;
   toast.textContent = msg;
   toast.style.opacity = '1';
-  
-  clearTimeout(toast._timeout);
+    clearTimeout(toast._timeout);
   toast._timeout = setTimeout(() => { toast.style.opacity = '0'; }, 3500);
 }
 
