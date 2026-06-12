@@ -1,1631 +1,1108 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Diamante Rastreador" />
-  <meta name="theme-color" content="#0a0a12" />
-  <title>DIAMANTE BLACK RASTREADOR</title>
-  
-  <script src="js/github_db.js" defer></script>
-  <script src="js/robou.js" defer></script>
-  <script src="js/ia_ponte.js" defer></script>
-  
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="css/estilo.css" />
-  
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
-    
-    :root {
-      --preto: #0a0a12;
-      --preto-card: #0f0f1a;
-      --preto-mid: #141422;
-      --ouro: #c8a84b;
-      --ouro-brilho:#f0d080;
-      --ouro-escuro:#7a6020;
-      --branco: #e8e0d0;
-      --cinza: #6a6a80;
-      --perigo: #c0392b;
-      --sucesso: #27ae60;
-      --azul-whats: #25d366;
-      --borda: rgba(200,168,75,0.25);
-      --sombra-ouro:0 0 18px rgba(200,168,75,0.3);
-      --font-titulo:'Cinzel Decorative', serif;
-      --font-corpo: 'Rajdhani', sans-serif;
-    }
-    
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    
-    html { scroll-behavior: smooth; }
-    
-    body {
-      background-color: var(--preto);      color: var(--branco);
-      font-family: var(--font-corpo);
-      font-size: 16px;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-    
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image: 
-        radial-gradient(ellipse 80% 40% at 50% 0%, rgba(200,168,75,0.07) 0%, transparent 70%),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='rgba(200,168,75,0.04)'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 0;
-    }
-    
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: var(--preto); }
-    ::-webkit-scrollbar-thumb { background: var(--ouro-escuro); border-radius: 4px; }
-    
-    /* ═══ HEADER ═══ */
-    #header {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: linear-gradient(180deg, rgba(10,10,18,0.98) 0%, rgba(10,10,18,0.90) 100%);
-      border-bottom: 1px solid var(--borda);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 18px;
-      height: 64px;
-      box-shadow: 0 2px 24px rgba(0,0,0,0.6);
-    }
-    
-    #header::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--ouro), var(--ouro-brilho), var(--ouro), transparent);
-      background-size: 200% 100%;
-      animation: shimmer 3s infinite linear;
-    }
-    
-    @keyframes shimmer {      0%{background-position:-200% 0}
-      100%{background-position:200% 0}
-    }
-    
-    #link-190 {
-      font-family: var(--font-corpo);
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      color: var(--cinza);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: color 0.25s;
-      min-width: 70px;
-    }
-    
-    #link-190:hover { color: var(--ouro); }
-    
-    #link-190 .icone-190 {
-      width: 20px; height: 20px;
-      background: var(--ouro-escuro);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 9px;
-      font-weight: 700;
-      color: var(--branco);
-    }
-    
-    #titulo-header {
-      text-align: center;
-      flex: 1;
-      line-height: 1;
-    }
-    
-    #titulo-header .label-diamond {
-      display: block;
-      font-family: var(--font-titulo);
-      font-size: clamp(11px,2.8vw,16px);
-      font-weight: 700;
-      letter-spacing: 3px;
-      color: var(--ouro-brilho);
-      text-shadow: 0 0 12px rgba(240,208,128,0.5), 0 0 30px rgba(200,168,75,0.2);
-    }
-    
-    #titulo-header .label-sub {
-      display: block;      font-size: 9px;
-      letter-spacing: 4px;
-      color: var(--cinza);
-      margin-top: 2px;
-      text-transform: uppercase;
-    }
-    
-    #btn-config {
-      background: none;
-      border: 1px solid var(--borda);
-      color: var(--cinza);
-      width: 36px; height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 18px;
-      transition: all 0.25s;
-      min-width: 36px;
-    }
-    
-    #btn-config:hover {
-      color: var(--ouro);
-      border-color: var(--ouro);
-      box-shadow: var(--sombra-ouro);
-      transform: rotate(45deg);
-    }
-    
-    /* ═══ MAIN ═══ */
-    #main {
-      position: relative;
-      z-index: 1;
-      padding-top: 64px;
-    }
-    
-    /* ═══ HERO ═══ */
-    #hero {
-      text-align: center;
-      padding: 48px 20px 36px;
-      position: relative;
-    }
-    
-    #hero .diamante-svg {
-      width: 54px; height: 54px;
-      margin: 0 auto 16px;
-      opacity: 0.9;
-      animation: float 4s ease-in-out infinite;
-      filter: drop-shadow(0 0 14px rgba(200,168,75,0.6));
-    }    
-    @keyframes float {
-      0%,100%{transform:translateY(0)}
-      50%{transform:translateY(-7px)}
-    }
-    
-    #hero h1 {
-      font-family: var(--font-titulo);
-      font-size: clamp(18px,5vw,30px);
-      font-weight: 900;
-      letter-spacing: 4px;
-      color: var(--ouro-brilho);
-      text-shadow: 0 0 20px rgba(200,168,75,0.4);
-      line-height: 1.2;
-    }
-    
-    #hero .subtitulo {
-      margin-top: 10px;
-      font-size: 13px;
-      letter-spacing: 2px;
-      color: var(--cinza);
-      text-transform: uppercase;
-    }
-    
-    .divisor {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin: 24px auto;
-      max-width: 340px;
-    }
-    
-    .divisor span {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--ouro-escuro));
-    }
-    
-    .divisor span:last-child {
-      background: linear-gradient(90deg, var(--ouro-escuro), transparent);
-    }
-    
-    .divisor .losango {
-      width: 8px; height: 8px;
-      background: var(--ouro);
-      transform: rotate(45deg);
-      box-shadow: 0 0 8px rgba(200,168,75,0.5);
-    }
-    
-    /* ═══ BUSCA ═══ */    #zona-busca {
-      padding: 0 16px 28px;
-      max-width: 640px;
-      margin: 0 auto;
-    }
-    
-    #busca-wrapper {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--preto-mid);
-      border: 1px solid var(--borda);
-      border-radius: 12px;
-      padding: 8px 12px;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    
-    #busca-wrapper:focus-within {
-      border-color: var(--ouro);
-      box-shadow: var(--sombra-ouro);
-    }
-    
-    #busca-wrapper .icone-busca {
-      color: var(--cinza);
-      font-size: 18px;
-      flex-shrink: 0;
-    }
-    
-    #campo-busca {
-      flex: 1;
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--branco);
-      font-family: var(--font-corpo);
-      font-size: 15px;
-      letter-spacing: 0.5px;
-    }
-    
-    #campo-busca::placeholder { color: var(--cinza); }
-    
-    #btn-avancada {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(135deg, var(--ouro-escuro), var(--ouro));
-      color: var(--preto);
-      border: none;
-      border-radius: 8px;
-      padding: 7px 13px;      font-family: var(--font-corpo);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.25s;
-      flex-shrink: 0;
-    }
-    
-    #btn-avancada:hover {
-      background: linear-gradient(135deg, var(--ouro), var(--ouro-brilho));
-      box-shadow: 0 0 14px rgba(200,168,75,0.4);
-    }
-    
-    #contador-pesquisas {
-      text-align: right;
-      font-size: 11px;
-      color: var(--cinza);
-      margin-top: 8px;
-      letter-spacing: 0.5px;
-    }
-    
-    #contador-pesquisas span {
-      color: var(--ouro);
-      font-weight: 700;
-    }
-    
-    /* ═══ BARRA AÇÕES ═══ */
-    #barra-acoes {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px 20px;
-      max-width: 640px;
-      margin: 0 auto;
-    }
-    
-    .label-mural {
-      font-size: 11px;
-      letter-spacing: 2px;
-      color: var(--cinza);
-      text-transform: uppercase;
-    }
-    
-    .label-mural strong { color: var(--ouro); }
-    
-    #btn-adicionar {
-      display: flex;
-      align-items: center;      gap: 8px;
-      background: transparent;
-      border: 1px solid var(--ouro);
-      color: var(--ouro);
-      border-radius: 10px;
-      padding: 9px 16px;
-      font-family: var(--font-corpo);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: all 0.25s;
-    }
-    
-    #btn-adicionar:hover {
-      background: var(--ouro);
-      color: var(--preto);
-      box-shadow: var(--sombra-ouro);
-    }
-    
-    #btn-adicionar .mais {
-      font-size: 18px;
-      line-height: 1;
-    }
-    
-    /* ═══ MURAL 3 COLUNAS ═══ */
-    #mural {
-      padding: 0 10px 40px;
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 8px;
-      max-width: 720px;
-      margin: 0 auto;
-    }
-    
-    .card-pessoa {
-      position: relative;
-      aspect-ratio: 3/4;
-      border-radius: 10px;
-      overflow: hidden;
-      cursor: pointer;
-      background: var(--preto-card);
-      border: 1px solid rgba(200,168,75,0.12);
-      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
-      animation: fadeInCard 0.4s ease both;
-    }
-    
-    @keyframes fadeInCard {
-      from{opacity:0;transform:translateY(16px)}
-      to{opacity:1;transform:translateY(0)}    }
-    
-    .card-pessoa:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 8px 28px rgba(0,0,0,0.7), 0 0 12px rgba(200,168,75,0.15);
-      border-color: rgba(200,168,75,0.35);
-      z-index: 2;
-    }
-    
-    .card-pessoa img {
-      width:100%; height:100%;
-      object-fit:cover;
-      display:block;
-      transition:transform 0.4s;
-    }
-    
-    .card-pessoa:hover img { transform: scale(1.06); }
-    
-    .card-pessoa .overlay {
-      position:absolute;
-      inset:0;
-      background:linear-gradient(180deg,transparent 45%,rgba(8,8,16,0.92) 100%);
-    }
-    
-    .card-info {
-      position:absolute;
-      bottom:0; left:0; right:0;
-      padding:8px;
-    }
-    
-    .card-nome {
-      font-family:var(--font-corpo);
-      font-size:12px;
-      font-weight:700;
-      color:var(--branco);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      line-height:1.2;
-    }
-    
-    .card-cidade {
-      font-size:10px;
-      color:var(--cinza);
-      letter-spacing:0.3px;
-      margin-top:2px;
-    }
-    
-    .card-tag {
-      position:absolute;      top:8px; left:8px;
-      font-size:9px;
-      font-weight:700;
-      letter-spacing:1px;
-      text-transform:uppercase;
-      padding:3px 8px;
-      border-radius:20px;
-    }
-    
-    .card-tag.ativo {
-      background:rgba(192,57,43,0.85);
-      color:#fff;
-      border:1px solid rgba(255,100,80,0.4);
-    }
-    
-    .card-tag.achado {
-      background:rgba(39,174,96,0.85);
-      color:#fff;
-      border:1px solid rgba(80,230,120,0.4);
-    }
-    
-    .card-pessoa .btn-admin-del {
-      display: none;
-      position:absolute;
-      top:8px; right:8px;
-      background:rgba(192,57,43,0.90);
-      color:#fff;
-      border:none;
-      border-radius:6px;
-      padding:4px 8px;
-      font-size:11px;
-      font-weight:700;
-      cursor:pointer;
-      z-index:5;
-      transition:background 0.2s;
-    }
-    
-    .card-pessoa .btn-admin-del:hover { background:var(--perigo); }
-    
-    body.admin-mode .card-pessoa .btn-admin-del { display: block; }
-    body.admin-mode .card-pessoa { border-color: rgba(192,57,43,0.4); }
-    
-    #badge-admin-ativo {
-      display: none;
-      position:fixed;
-      bottom:80px;
-      left:50%;
-      transform:translateX(-50%);
-      background:var(--perigo);
-      color:#fff;      border-radius:20px;
-      padding:8px 20px;
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:1px;
-      z-index:500;
-      box-shadow:0 4px 16px rgba(0,0,0,0.5);
-    }
-    
-    body.admin-mode #badge-admin-ativo { display: block; }
-    
-    .card-skeleton {
-      aspect-ratio:3/4;
-      border-radius:10px;
-      background:linear-gradient(110deg,var(--preto-card) 30%,#1a1a2a 50%,var(--preto-card) 70%);
-      background-size:200% 100%;
-      animation:skeleton-anim 1.4s infinite;
-    }
-    
-    @keyframes skeleton-anim {
-      0%{background-position:200% 0}
-      100%{background-position:-200% 0}
-    }
-    
-    /* ═══ MODAIS ═══ */
-    .modal-overlay {
-      position:fixed;
-      inset:0;
-      background:rgba(5,5,12,0.88);
-      backdrop-filter:blur(6px);
-      -webkit-backdrop-filter:blur(6px);
-      z-index:200;
-      display:flex;
-      align-items:flex-end;
-      justify-content:center;
-      opacity:0;
-      pointer-events:none;
-      transition:opacity 0.3s;
-    }
-    
-    .modal-overlay.ativo {
-      opacity:1;
-      pointer-events:all;
-    }
-    
-    .modal-box {
-      background:var(--preto-mid);
-      border:1px solid var(--borda);
-      border-radius:20px 20px 0 0;
-      width:100%;      max-width:540px;
-      max-height:88vh;
-      overflow-y:auto;
-      padding:24px 20px 36px;
-      transform:translateY(100%);
-      transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);
-      box-shadow:0 -8px 40px rgba(0,0,0,0.7);
-    }
-    
-    .modal-overlay.ativo .modal-box { transform:translateY(0); }
-    
-    .modal-alca {
-      width:40px; height:4px;
-      background:var(--cinza);
-      border-radius:2px;
-      margin:0 auto 20px;
-      opacity:0.4;
-    }
-    
-    .modal-titulo {
-      font-family:var(--font-titulo);
-      font-size:15px;
-      color:var(--ouro);
-      letter-spacing:2px;
-      margin-bottom:20px;
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
-    
-    .modal-abas {
-      display:flex;
-      gap:4px;
-      background:var(--preto-card);
-      border-radius:10px;
-      padding:4px;
-      margin-bottom:20px;
-      flex-wrap:wrap;
-    }
-    
-    .aba-btn {
-      flex:1;
-      min-width:60px;
-      background:transparent;
-      border:none;
-      color:var(--cinza);
-      padding:9px 6px;
-      border-radius:8px;
-      font-family:var(--font-corpo);
-      font-size:12px;      font-weight:600;
-      letter-spacing:0.5px;
-      cursor:pointer;
-      transition:all 0.2s;
-    }
-    
-    .aba-btn.ativo {
-      background:var(--preto-mid);
-      color:var(--ouro);
-      box-shadow:0 2px 8px rgba(0,0,0,0.4);
-    }
-    
-    .aba-painel { display:none; }
-    .aba-painel.ativo { display:block; }
-    
-    .info-bloco {
-      background:var(--preto-card);
-      border:1px solid var(--borda);
-      border-radius:12px;
-      padding:16px;
-      margin-bottom:14px;
-    }
-    
-    .info-bloco h3 {
-      font-size:12px;
-      letter-spacing:2px;
-      color:var(--ouro);
-      text-transform:uppercase;
-      margin-bottom:10px;
-    }
-    
-    .info-bloco p, .info-bloco a {
-      font-size:14px;
-      color:var(--branco);
-      line-height:1.6;
-    }
-    
-    .info-bloco a {
-      color:var(--azul-whats);
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    
-    .info-bloco a:hover { text-decoration:underline; }
-    
-    .campo-label {
-      font-size:11px;
-      letter-spacing:1.5px;      color:var(--cinza);
-      text-transform:uppercase;
-      margin-bottom:6px;
-      margin-top:14px;
-      display:block;
-    }
-    
-    .campo-input {
-      width:100%;
-      background:var(--preto-card);
-      border:1px solid var(--borda);
-      border-radius:8px;
-      color:var(--branco);
-      font-family:var(--font-corpo);
-      font-size:14px;
-      padding:10px 14px;
-      outline:none;
-      transition:border-color 0.2s;
-    }
-    
-    .campo-input:focus { border-color:var(--ouro); }
-    .campo-input::placeholder { color:var(--cinza); }
-    
-    .limites-grid {
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:8px;
-      margin-top:6px;
-    }
-    
-    .limite-btn {
-      background:var(--preto-card);
-      border:1px solid var(--borda);
-      color:var(--cinza);
-      border-radius:8px;
-      padding:10px;
-      font-family:var(--font-corpo);
-      font-size:16px;
-      font-weight:700;
-      cursor:pointer;
-      transition:all 0.2s;
-      text-align:center;
-    }
-    
-    .limite-btn.ativo, .limite-btn:hover {
-      background:var(--ouro-escuro);
-      border-color:var(--ouro);
-      color:var(--ouro-brilho);
-    }
-        .btn-salvar {
-      width:100%;
-      margin-top:20px;
-      background:linear-gradient(135deg,var(--ouro-escuro),var(--ouro));
-      color:var(--preto);
-      border:none;
-      border-radius:10px;
-      padding:14px;
-      font-family:var(--font-titulo);
-      font-size:13px;
-      font-weight:700;
-      letter-spacing:2px;
-      cursor:pointer;
-      transition:all 0.25s;
-    }
-    
-    .btn-salvar:hover {
-      background:linear-gradient(135deg,var(--ouro),var(--ouro-brilho));
-      box-shadow:var(--sombra-ouro);
-    }
-    
-    .admin-lock {
-      text-align:center;
-      padding:30px 20px;
-    }
-    
-    .admin-lock .icone-lock {
-      font-size:36px;
-      margin-bottom:14px;
-      opacity:0.7;
-    }
-    
-    .admin-lock p {
-      font-size:13px;
-      color:var(--cinza);
-      margin-bottom:16px;
-      letter-spacing:0.5px;
-    }
-    
-    .admin-lock .btn-entrar {
-      background:transparent;
-      border:1px solid var(--ouro);
-      color:var(--ouro);
-      border-radius:8px;
-      padding:10px 24px;
-      font-family:var(--font-corpo);
-      font-size:13px;
-      font-weight:700;
-      letter-spacing:1px;
-      cursor:pointer;      transition:all 0.2s;
-    }
-    
-    .admin-lock .btn-entrar:hover {
-      background:var(--ouro);
-      color:var(--preto);
-    }
-    
-    /* ═══ MODAL CADASTRO ═══ */
-    .foto-upload {
-      width:100%;
-      aspect-ratio:1;
-      max-width:160px;
-      margin:0 auto 20px;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      justify-content:center;
-      border:2px dashed var(--borda);
-      border-radius:16px;
-      cursor:pointer;
-      color:var(--cinza);
-      font-size:13px;
-      gap:8px;
-      transition:border-color 0.2s;
-      background:var(--preto-card);
-      overflow:hidden;
-    }
-    
-    .foto-upload:hover {
-      border-color:var(--ouro);
-      color:var(--ouro);
-    }
-    
-    .foto-upload .icone-foto { font-size:32px; }
-    .foto-upload img { width:100%; height:100%; object-fit:cover; }
-    
-    /* ═══ MODAL DETALHE ═══ */
-    #modal-detalhe .modal-box {
-      border-radius:20px;
-      max-height:92vh;
-    }
-    
-    .modal-overlay.centralizado { align-items:center; }
-    
-    .detalhe-foto-container {
-      position:relative;
-      width:100%;
-      margin-bottom:16px;
-    }    
-    .detalhe-foto {
-      width:100%;
-      max-height:300px;
-      object-fit:cover;
-      border-radius:12px;
-      display:block;
-    }
-    
-    #btn-compartilhar-foto {
-      position:absolute;
-      bottom:10px; right:10px;
-      background:rgba(10,10,18,0.80);
-      backdrop-filter:blur(6px);
-      border:1px solid var(--borda);
-      color:var(--ouro);
-      border-radius:8px;
-      padding:8px 12px;
-      font-size:13px;
-      font-weight:700;
-      font-family:var(--font-corpo);
-      letter-spacing:0.5px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      gap:6px;
-      transition:all 0.2s;
-    }
-    
-    #btn-compartilhar-foto:hover {
-      background:var(--ouro);
-      color:var(--preto);
-      border-color:var(--ouro);
-    }
-    
-    .detalhe-nome {
-      font-family:var(--font-titulo);
-      font-size:20px;
-      color:var(--ouro-brilho);
-      margin-bottom:4px;
-    }
-    
-    .detalhe-meta {
-      font-size:13px;
-      color:var(--cinza);
-      margin-bottom:14px;
-    }
-    
-    .detalhe-desc {
-      font-size:15px;      line-height:1.65;
-      color:var(--branco);
-      margin-bottom:20px;
-    }
-    
-    .detalhe-acoes {
-      display:flex;
-      flex-direction:column;
-      gap:10px;
-    }
-    
-    .btn-whatsapp {
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      width:100%;
-      background:var(--azul-whats);
-      color:#fff;
-      border:none;
-      border-radius:10px;
-      padding:14px;
-      font-family:var(--font-corpo);
-      font-size:15px;
-      font-weight:700;
-      letter-spacing:1px;
-      cursor:pointer;
-      text-decoration:none;
-      transition:filter 0.2s;
-    }
-    
-    .btn-whatsapp:hover { filter:brightness(1.1); }
-    
-    #btn-marcar-achado {
-      width:100%;
-      background:var(--sucesso);
-      color:#fff;
-      border:none;
-      border-radius:10px;
-      padding:13px;
-      font-family:var(--font-corpo);
-      font-size:14px;
-      font-weight:700;
-      letter-spacing:1px;
-      cursor:pointer;
-      transition:filter 0.2s;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;    }
-    
-    #btn-marcar-achado:hover { filter:brightness(1.1); }
-    
-    #btn-apagar-postagem {
-      width:100%;
-      background:transparent;
-      color:var(--perigo);
-      border:1px solid var(--perigo);
-      border-radius:10px;
-      padding:11px;
-      font-family:var(--font-corpo);
-      font-size:13px;
-      font-weight:700;
-      letter-spacing:1px;
-      cursor:pointer;
-      transition:all 0.2s;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-    }
-    
-    #btn-apagar-postagem:hover {
-      background:var(--perigo);
-      color:#fff;
-    }
-    
-    #btn-apagar-admin {
-      width:100%;
-      background:var(--perigo);
-      color:#fff;
-      border:none;
-      border-radius:10px;
-      padding:13px;
-      font-family:var(--font-corpo);
-      font-size:14px;
-      font-weight:700;
-      letter-spacing:1px;
-      cursor:pointer;
-      transition:filter 0.2s;
-      display:none;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-    }
-    
-    #btn-apagar-admin:hover { filter:brightness(1.1); }
-    body.admin-mode #btn-apagar-admin { display:flex; }
-        .btn-fechar-modal {
-      position:absolute;
-      top:14px; right:14px;
-      background:var(--preto-card);
-      border:1px solid var(--borda);
-      color:var(--cinza);
-      width:30px; height:30px;
-      border-radius:50%;
-      font-size:16px;
-      cursor:pointer;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      transition:all 0.2s;
-    }
-    
-    .btn-fechar-modal:hover {
-      color:var(--branco);
-      border-color:var(--cinza);
-    }
-    
-    /* ═══ SEÇÃO BANCO DE DADOS (Admin) ═══ */
-    .admin-db-box {
-      background:var(--preto-card);
-      border:1px solid rgba(200,168,75,0.2);
-      border-radius:12px;
-      padding:16px;
-      margin-top:8px;
-    }
-    
-    .admin-db-box h3 {
-      font-size:12px;
-      letter-spacing:2px;
-      color:var(--ouro);
-      text-transform:uppercase;
-      margin-bottom:12px;
-    }
-    
-    .admin-db-actions {
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:8px;
-    }
-    
-    .btn-db {
-      padding:11px 8px;
-      border-radius:8px;
-      font-family:var(--font-corpo);
-      font-size:12px;
-      font-weight:700;      letter-spacing:0.5px;
-      cursor:pointer;
-      border:1px solid var(--borda);
-      transition:all 0.2s;
-      text-align:center;
-    }
-    
-    .btn-db.exportar {
-      background:var(--preto-mid);
-      color:var(--ouro);
-    }
-    
-    .btn-db.exportar:hover { border-color:var(--ouro); }
-    
-    .btn-db.importar {
-      background:var(--preto-mid);
-      color:var(--azul-whats);
-      border-color:rgba(37,211,102,0.3);
-    }
-    
-    .btn-db.importar:hover { border-color:var(--azul-whats); }
-    
-    /* ═══ FOOTER ═══ */
-    #footer {
-      position:relative;
-      z-index:1;
-      text-align:center;
-      padding:20px;
-      border-top:1px solid var(--borda);
-      font-size:11px;
-      color:var(--cinza);
-      letter-spacing:1.5px;
-    }
-    
-    #footer .logo-footer {
-      font-family:var(--font-titulo);
-      font-size:13px;
-      color:var(--ouro-escuro);
-      margin-bottom:6px;
-    }
-    
-    @media (max-width:360px) {
-      #titulo-header .label-diamond { font-size:10px; letter-spacing:2px; }
-      .card-nome { font-size:10px; }
-      .aba-btn { font-size:10px; padding:8px 4px; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Diamante Rastreador" />
+<meta name="theme-color" content="#0a0a12" />
+<title>DIAMANTE BLACK RASTREADOR</title>
+
+<!-- 🔥 FIREBASE SDKs (NOVO - substitui github_db.js) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+<script src="js/firebase_db.js" defer></script>
+
+<script src="js/robou.js" defer></script>
+<script src="js/ia_ponte.js" defer></script>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/estilo.css" />
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+:root {
+  --preto: #0a0a12;
+  --preto-card: #0f0f1a;
+  --preto-mid: #141422;
+  --ouro: #c8a84b;
+  --ouro-brilho:#f0d080;
+  --ouro-escuro:#7a6020;
+  --branco: #e8e0d0;
+  --cinza: #6a6a80;
+  --perigo: #c0392b;
+  --sucesso: #27ae60;
+  --azul-whats: #25d366;
+  --borda: rgba(200,168,75,0.25);
+  --sombra-ouro:0 0 18px rgba(200,168,75,0.3);
+  --font-titulo:'Cinzel Decorative', serif;
+  --font-corpo: 'Rajdhani', sans-serif;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--preto);
+  color: var(--branco);
+  font-family: var(--font-corpo);
+  font-size: 16px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(200,168,75,0.07) 0%, transparent 70%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='1' height='1' fill='rgba(200,168,75,0.04)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--preto); }
+::-webkit-scrollbar-thumb { background: var(--ouro-escuro); border-radius: 4px; }
+
+/* ═══ HEADER ═══ */
+#header {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: linear-gradient(180deg, rgba(10,10,18,0.98) 0%, rgba(10,10,18,0.90) 100%);
+  border-bottom: 1px solid var(--borda);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px; height: 64px;
+  box-shadow: 0 2px 24px rgba(0,0,0,0.6);
+}
+#header::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--ouro), var(--ouro-brilho), var(--ouro), transparent);
+  background-size: 200% 100%; animation: shimmer 3s infinite linear;
+}
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+#link-190 {
+  font-family: var(--font-corpo); font-size: 11px; font-weight: 600;
+  letter-spacing: 1px; color: var(--cinza); text-decoration: none;
+  display: flex; align-items: center; gap: 5px; transition: color 0.25s; min-width: 70px;
+}
+#link-190:hover { color: var(--ouro); }
+#link-190 .icone-190 {
+  width: 20px; height: 20px; background: var(--ouro-escuro); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; color: var(--branco);
+}
+#titulo-header { text-align: center; flex: 1; line-height: 1; }
+#titulo-header .label-diamond {
+  display: block; font-family: var(--font-titulo);
+  font-size: clamp(11px,2.8vw,16px); font-weight: 700; letter-spacing: 3px;
+  color: var(--ouro-brilho);
+  text-shadow: 0 0 12px rgba(240,208,128,0.5), 0 0 30px rgba(200,168,75,0.2);
+}
+#titulo-header .label-sub {
+  display: block; font-size: 9px; letter-spacing: 4px; color: var(--cinza);
+  margin-top: 2px; text-transform: uppercase;}
+#btn-config {
+  background: none; border: 1px solid var(--borda); color: var(--cinza);
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px; transition: all 0.25s; min-width: 36px;
+}
+#btn-config:hover { color: var(--ouro); border-color: var(--ouro); box-shadow: var(--sombra-ouro); transform: rotate(45deg); }
+
+/* ═══ MAIN ═══ */
+#main { position: relative; z-index: 1; padding-top: 64px; }
+
+/* ═══ HERO ═══ */
+#hero { text-align: center; padding: 48px 20px 36px; position: relative; }
+#hero .diamante-svg {
+  width: 54px; height: 54px; margin: 0 auto 16px; opacity: 0.9;
+  animation: float 4s ease-in-out infinite; filter: drop-shadow(0 0 14px rgba(200,168,75,0.6));
+}
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+#hero h1 {
+  font-family: var(--font-titulo);
+  font-size: clamp(18px,5vw,30px); font-weight: 900; letter-spacing: 4px;
+  color: var(--ouro-brilho); text-shadow: 0 0 20px rgba(200,168,75,0.4); line-height: 1.2;
+}
+#hero .subtitulo {
+  margin-top: 10px; font-size: 13px; letter-spacing: 2px;
+  color: var(--cinza); text-transform: uppercase;
+}
+.divisor { display: flex; align-items: center; gap: 12px; margin: 24px auto; max-width: 340px; }
+.divisor span { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--ouro-escuro)); }
+.divisor span:last-child { background: linear-gradient(90deg, var(--ouro-escuro), transparent); }
+.divisor .losango {
+  width: 8px; height: 8px; background: var(--ouro); transform: rotate(45deg);
+  box-shadow: 0 0 8px rgba(200,168,75,0.5);
+}
+
+/* ═══ BUSCA ═══ */
+#zona-busca { padding: 0 16px 28px; max-width: 640px; margin: 0 auto; }
+#busca-wrapper {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--preto-mid); border: 1px solid var(--borda); border-radius: 12px;
+  padding: 8px 12px; transition: border-color 0.3s, box-shadow 0.3s;
+}
+#busca-wrapper:focus-within { border-color: var(--ouro); box-shadow: var(--sombra-ouro); }
+#busca-wrapper .icone-busca { color: var(--cinza); font-size: 18px; flex-shrink: 0; }
+#campo-busca {
+  flex: 1; background: transparent; border: none; outline: none;
+  color: var(--branco); font-family: var(--font-corpo); font-size: 15px; letter-spacing: 0.5px;
+}
+#campo-busca::placeholder { color: var(--cinza); }#btn-avancada {
+  display: flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--ouro-escuro), var(--ouro));
+  color: var(--preto); border: none; border-radius: 8px;
+  padding: 7px 13px; font-family: var(--font-corpo); font-size: 12px;
+  font-weight: 700; letter-spacing: 1px; cursor: pointer; white-space: nowrap;
+  transition: all 0.25s; flex-shrink: 0;
+}
+#btn-avancada:hover { background: linear-gradient(135deg, var(--ouro), var(--ouro-brilho)); box-shadow: 0 0 14px rgba(200,168,75,0.4); }
+#contador-pesquisas { text-align: right; font-size: 11px; color: var(--cinza); margin-top: 8px; letter-spacing: 0.5px; }
+#contador-pesquisas span { color: var(--ouro); font-weight: 700; }
+
+/* ═══ BARRA AÇÕES ═══ */
+#barra-acoes { display: flex; align-items: center; justify-content: space-between; padding: 0 16px 20px; max-width: 640px; margin: 0 auto; }
+.label-mural { font-size: 11px; letter-spacing: 2px; color: var(--cinza); text-transform: uppercase; }
+.label-mural strong { color: var(--ouro); }
+#btn-adicionar {
+  display: flex; align-items: center; gap: 8px;
+  background: transparent; border: 1px solid var(--ouro); color: var(--ouro);
+  border-radius: 10px; padding: 9px 16px; font-family: var(--font-corpo);
+  font-size: 13px; font-weight: 700; letter-spacing: 1px; cursor: pointer; transition: all 0.25s;
+}
+#btn-adicionar:hover { background: var(--ouro); color: var(--preto); box-shadow: var(--sombra-ouro); }
+#btn-adicionar .mais { font-size: 18px; line-height: 1; }
+
+/* ═══ MURAL 3 COLUNAS ═══ */
+#mural { padding: 0 10px 40px; display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; max-width: 720px; margin: 0 auto; }
+.card-pessoa {
+  position: relative; aspect-ratio: 3/4; border-radius: 10px; overflow: hidden;
+  cursor: pointer; background: var(--preto-card);
+  border: 1px solid rgba(200,168,75,0.12);
+  transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+  animation: fadeInCard 0.4s ease both;
+}
+@keyframes fadeInCard { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+.card-pessoa:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 8px 28px rgba(0,0,0,0.7), 0 0 12px rgba(200,168,75,0.15);
+  border-color: rgba(200,168,75,0.35); z-index: 2;
+}
+.card-pessoa img { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s; }
+.card-pessoa:hover img { transform: scale(1.06); }
+.card-pessoa .overlay { position:absolute; inset:0; background:linear-gradient(180deg,transparent 45%,rgba(8,8,16,0.92) 100%); }
+.card-info { position:absolute; bottom:0; left:0; right:0; padding:8px; }
+.card-nome {
+  font-family:var(--font-corpo); font-size:12px; font-weight:700;
+  color:var(--branco); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2;
+}
+.card-cidade { font-size:10px; color:var(--cinza); letter-spacing:0.3px; margin-top:2px; }
+.card-tag {  position:absolute; top:8px; left:8px; font-size:9px; font-weight:700;
+  letter-spacing:1px; text-transform:uppercase; padding:3px 8px; border-radius:20px;
+}
+.card-tag.ativo { background:rgba(192,57,43,0.85); color:#fff; border:1px solid rgba(255,100,80,0.4); }
+.card-tag.achado { background:rgba(39,174,96,0.85); color:#fff; border:1px solid rgba(80,230,120,0.4); }
+.card-pessoa .btn-admin-del {
+  display: none; position:absolute; top:8px; right:8px;
+  background:rgba(192,57,43,0.90); color:#fff; border:none; border-radius:6px;
+  padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer; z-index:5; transition:background 0.2s;
+}
+.card-pessoa .btn-admin-del:hover { background:var(--perigo); }
+body.admin-mode .card-pessoa .btn-admin-del { display: block; }
+body.admin-mode .card-pessoa { border-color: rgba(192,57,43,0.4); }
+#badge-admin-ativo {
+  display: none; position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+  background:var(--perigo); color:#fff; border-radius:20px; padding:8px 20px;
+  font-size:12px; font-weight:700; letter-spacing:1px; z-index:500;
+  box-shadow:0 4px 16px rgba(0,0,0,0.5);
+}
+body.admin-mode #badge-admin-ativo { display: block; }
+.card-skeleton {
+  aspect-ratio:3/4; border-radius:10px;
+  background:linear-gradient(110deg,var(--preto-card) 30%,#1a1a2a 50%,var(--preto-card) 70%);
+  background-size:200% 100%; animation:skeleton-anim 1.4s infinite;
+}
+@keyframes skeleton-anim { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+
+/* ═══ NOVO: ESTILO DAS PASTAS ADMIN ═══ */
+.admin-pasta-container {
+  background: var(--preto-card);
+  border: 1px solid var(--borda);
+  border-radius: 12px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+.admin-pasta-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: var(--preto-mid);
+  cursor: pointer;
+  transition: background 0.2s;
+  user-select: none;
+}
+.admin-pasta-header:hover { background: rgba(200,168,75,0.08); }
+.admin-pasta-header h3 {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--ouro);  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+.admin-pasta-header .pasta-contador {
+  background: var(--ouro-escuro);
+  color: var(--branco);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+  min-width: 24px;
+  text-align: center;
+}
+.admin-pasta-header .pasta-seta {
+  color: var(--cinza);
+  font-size: 14px;
+  transition: transform 0.3s;
+}
+.admin-pasta-header.aberto .pasta-seta { transform: rotate(180deg); }
+.admin-pasta-conteudo {
+  display: none;
+  padding: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.admin-pasta-conteudo.aberto { display: block; }
+.admin-pasta-vazio {
+  text-align: center;
+  padding: 20px;
+  color: var(--cinza);
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+.admin-registro-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: var(--preto-mid);
+  border: 1px solid rgba(200,168,75,0.1);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+  transition: border-color 0.2s;
+}
+.admin-registro-item:hover { border-color: var(--ouro); }
+.admin-registro-item img {
+  width: 50px;  height: 50px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.admin-registro-info { flex: 1; min-width: 0; }
+.admin-registro-info .nome {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--branco);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.admin-registro-info .meta {
+  font-size: 11px;
+  color: var(--cinza);
+  margin-top: 2px;
+}
+.admin-registro-whats {
+  background: var(--azul-whats);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: filter 0.2s;
+}
+.admin-registro-whats:hover { filter: brightness(1.15); }
+
+/* ═══ MODAIS ═══ */
+.modal-overlay {
+  position:fixed; inset:0;
+  background:rgba(5,5,12,0.88); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+  z-index:200; display:flex; align-items:flex-end; justify-content:center;
+  opacity:0; pointer-events:none; transition:opacity 0.3s;
+}
+.modal-overlay.ativo { opacity:1; pointer-events:all; }
+.modal-box {
+  background:var(--preto-mid); border:1px solid var(--borda);
+  border-radius:20px 20px 0 0; width:100%; max-width:540px; max-height:88vh;
+  overflow-y:auto; padding:24px 20px 36px;
+  transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.32,0.72,0,1);
+  box-shadow:0 -8px 40px rgba(0,0,0,0.7);
+}
+.modal-overlay.ativo .modal-box { transform:translateY(0); }
+.modal-alca { width:40px; height:4px; background:var(--cinza); border-radius:2px; margin:0 auto 20px; opacity:0.4; }.modal-titulo {
+  font-family:var(--font-titulo); font-size:15px; color:var(--ouro);
+  letter-spacing:2px; margin-bottom:20px; display:flex; align-items:center; gap:10px;
+}
+.modal-abas { display:flex; gap:4px; background:var(--preto-card); border-radius:10px; padding:4px; margin-bottom:20px; flex-wrap:wrap; }
+.aba-btn {
+  flex:1; min-width:60px; background:transparent; border:none; color:var(--cinza);
+  padding:9px 6px; border-radius:8px; font-family:var(--font-corpo);
+  font-size:12px; font-weight:600; letter-spacing:0.5px; cursor:pointer; transition:all 0.2s;
+}
+.aba-btn.ativo { background:var(--preto-mid); color:var(--ouro); box-shadow:0 2px 8px rgba(0,0,0,0.4); }
+.aba-painel { display:none; }
+.aba-painel.ativo { display:block; }
+.info-bloco { background:var(--preto-card); border:1px solid var(--borda); border-radius:12px; padding:16px; margin-bottom:14px; }
+.info-bloco h3 { font-size:12px; letter-spacing:2px; color:var(--ouro); text-transform:uppercase; margin-bottom:10px; }
+.info-bloco p, .info-bloco a { font-size:14px; color:var(--branco); line-height:1.6; }
+.info-bloco a { color:var(--azul-whats); text-decoration:none; display:flex; align-items:center; gap:8px; }
+.info-bloco a:hover { text-decoration:underline; }
+.campo-label { font-size:11px; letter-spacing:1.5px; color:var(--cinza); text-transform:uppercase; margin-bottom:6px; margin-top:14px; display:block; }
+.campo-input {
+  width:100%; background:var(--preto-card); border:1px solid var(--borda);
+  border-radius:8px; color:var(--branco); font-family:var(--font-corpo);
+  font-size:14px; padding:10px 14px; outline:none; transition:border-color 0.2s;
+}
+.campo-input:focus { border-color:var(--ouro); }
+.campo-input::placeholder { color:var(--cinza); }
+.limites-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:6px; }
+.limite-btn {
+  background:var(--preto-card); border:1px solid var(--borda); color:var(--cinza);
+  border-radius:8px; padding:10px; font-family:var(--font-corpo);
+  font-size:16px; font-weight:700; cursor:pointer; transition:all 0.2s; text-align:center;
+}
+.limite-btn.ativo, .limite-btn:hover { background:var(--ouro-escuro); border-color:var(--ouro); color:var(--ouro-brilho); }
+.btn-salvar {
+  width:100%; margin-top:20px;
+  background:linear-gradient(135deg,var(--ouro-escuro),var(--ouro));
+  color:var(--preto); border:none; border-radius:10px; padding:14px;
+  font-family:var(--font-titulo); font-size:13px; font-weight:700; letter-spacing:2px;
+  cursor:pointer; transition:all 0.25s;
+}
+.btn-salvar:hover { background:linear-gradient(135deg,var(--ouro),var(--ouro-brilho)); box-shadow:var(--sombra-ouro); }
+.admin-lock { text-align:center; padding:30px 20px; }
+.admin-lock .icone-lock { font-size:36px; margin-bottom:14px; opacity:0.7; }
+.admin-lock p { font-size:13px; color:var(--cinza); margin-bottom:16px; letter-spacing:0.5px; }
+.admin-lock .btn-entrar {
+  background:transparent; border:1px solid var(--ouro); color:var(--ouro);
+  border-radius:8px; padding:10px 24px; font-family:var(--font-corpo);
+  font-size:13px; font-weight:700; letter-spacing:1px; cursor:pointer; transition:all 0.2s;
+}
+.admin-lock .btn-entrar:hover { background:var(--ouro); color:var(--preto); }
+/* ═══ MODAL CADASTRO ═══ */
+.foto-upload {
+  width:100%; aspect-ratio:1; max-width:160px; margin:0 auto 20px;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  border:2px dashed var(--borda); border-radius:16px; cursor:pointer;
+  color:var(--cinza); font-size:13px; gap:8px; transition:border-color 0.2s;
+  background:var(--preto-card); overflow:hidden;
+}
+.foto-upload:hover { border-color:var(--ouro); color:var(--ouro); }
+.foto-upload .icone-foto { font-size:32px; }
+.foto-upload img { width:100%; height:100%; object-fit:cover; }
+
+/* ═══ MODAL DETALHE ═══ */
+#modal-detalhe .modal-box { border-radius:20px; max-height:92vh; }
+.modal-overlay.centralizado { align-items:center; }
+.detalhe-foto-container { position:relative; width:100%; margin-bottom:16px; }
+.detalhe-foto { width:100%; max-height:300px; object-fit:cover; border-radius:12px; display:block; }
+#btn-compartilhar-foto {
+  position:absolute; bottom:10px; right:10px;
+  background:rgba(10,10,18,0.80); backdrop-filter:blur(6px);
+  border:1px solid var(--borda); color:var(--ouro); border-radius:8px;
+  padding:8px 12px; font-size:13px; font-weight:700; font-family:var(--font-corpo);
+  letter-spacing:0.5px; cursor:pointer; display:flex; align-items:center; gap:6px;
+  transition:all 0.2s;
+}
+#btn-compartilhar-foto:hover { background:var(--ouro); color:var(--preto); border-color:var(--ouro); }
+.detalhe-nome { font-family:var(--font-titulo); font-size:20px; color:var(--ouro-brilho); margin-bottom:4px; }
+.detalhe-meta { font-size:13px; color:var(--cinza); margin-bottom:14px; }
+.detalhe-desc { font-size:15px; line-height:1.65; color:var(--branco); margin-bottom:20px; }
+.detalhe-acoes { display:flex; flex-direction:column; gap:10px; }
+.btn-whatsapp {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; background:var(--azul-whats); color:#fff; border:none;
+  border-radius:10px; padding:14px; font-family:var(--font-corpo);
+  font-size:15px; font-weight:700; letter-spacing:1px; cursor:pointer;
+  text-decoration:none; transition:filter 0.2s;
+}
+.btn-whatsapp:hover { filter:brightness(1.1); }
+#btn-marcar-achado {
+  width:100%; background:var(--sucesso); color:#fff; border:none;
+  border-radius:10px; padding:13px; font-family:var(--font-corpo);
+  font-size:14px; font-weight:700; letter-spacing:1px; cursor:pointer;
+  transition:filter 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;
+}
+#btn-marcar-achado:hover { filter:brightness(1.1); }
+#btn-apagar-postagem {
+  width:100%; background:transparent; color:var(--perigo); border:1px solid var(--perigo);
+  border-radius:10px; padding:11px; font-family:var(--font-corpo);
+  font-size:13px; font-weight:700; letter-spacing:1px; cursor:pointer;  transition:all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;
+}
+#btn-apagar-postagem:hover { background:var(--perigo); color:#fff; }
+#btn-apagar-admin {
+  width:100%; background:var(--perigo); color:#fff; border:none;
+  border-radius:10px; padding:13px; font-family:var(--font-corpo);
+  font-size:14px; font-weight:700; letter-spacing:1px; cursor:pointer;
+  transition:filter 0.2s; display:none; align-items:center; justify-content:center; gap:8px;
+}
+#btn-apagar-admin:hover { filter:brightness(1.1); }
+body.admin-mode #btn-apagar-admin { display:flex; }
+.btn-fechar-modal {
+  position:absolute; top:14px; right:14px;
+  background:var(--preto-card); border:1px solid var(--borda); color:var(--cinza);
+  width:30px; height:30px; border-radius:50%; font-size:16px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+}
+.btn-fechar-modal:hover { color:var(--branco); border-color:var(--cinza); }
+
+/* ═══ SEÇÃO BANCO DE DADOS (Admin) ═══ */
+.admin-db-box { background:var(--preto-card); border:1px solid rgba(200,168,75,0.2); border-radius:12px; padding:16px; margin-top:8px; }
+.admin-db-box h3 { font-size:12px; letter-spacing:2px; color:var(--ouro); text-transform:uppercase; margin-bottom:12px; }
+.admin-db-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.btn-db {
+  padding:11px 8px; border-radius:8px; font-family:var(--font-corpo);
+  font-size:12px; font-weight:700; letter-spacing:0.5px; cursor:pointer;
+  border:1px solid var(--borda); transition:all 0.2s; text-align:center;
+}
+.btn-db.exportar { background:var(--preto-mid); color:var(--ouro); }
+.btn-db.exportar:hover { border-color:var(--ouro); }
+.btn-db.importar { background:var(--preto-mid); color:var(--azul-whats); border-color:rgba(37,211,102,0.3); }
+.btn-db.importar:hover { border-color:var(--azul-whats); }
+
+/* ═══ FOOTER ═══ */
+#footer { position:relative; z-index:1; text-align:center; padding:20px; border-top:1px solid var(--borda); font-size:11px; color:var(--cinza); letter-spacing:1.5px; }
+#footer .logo-footer { font-family:var(--font-titulo); font-size:13px; color:var(--ouro-escuro); margin-bottom:6px; }
+@media (max-width:360px) {
+  #titulo-header .label-diamond { font-size:10px; letter-spacing:2px; }
+  .card-nome { font-size:10px; }
+  .aba-btn { font-size:10px; padding:8px 4px; }
+}
+</style>
 </head>
 <body>
-  <div id="badge-admin-ativo">🔐 MODO ADMIN — Clique em um card para apagar</div>  
-  <header id="header">
-    <a id="link-190" href="tel:190" title="Discar 190">
-      <span class="icone-190">🚔</span> 190
-    </a>
-    <div id="titulo-header">
-      <span class="label-diamond">◆ DIAMANTE ◆<br>RASTREADOR</span>
-      <span class="label-sub">Busca de Desaparecidos</span>
+<div id="badge-admin-ativo">🔐 MODO ADMIN — Clique em um card para apagar</div>
+<header id="header">
+  <a id="link-190" href="tel:190" title="Discar 190">
+    <span class="icone-190">🚔</span> 190
+  </a>
+  <div id="titulo-header">    <span class="label-diamond">◆ DIAMANTE ◆<br>RASTREADOR</span>
+    <span class="label-sub">Busca de Desaparecidos</span>
+  </div>
+  <button id="btn-config" title="Configurações" onclick="abrirModalConfig()">⚙️</button>
+</header>
+<main id="main">
+  <section id="hero">
+    <svg class="diamante-svg" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,2 98,28 80,78 20,78 2,28" fill="none" stroke="#c8a84b" stroke-width="2"/>
+      <polygon points="50,2 80,28 50,78 20,28" fill="rgba(200,168,75,0.08)" stroke="#c8a84b" stroke-width="1" stroke-dasharray="4,3"/>
+      <polygon points="2,28 98,28 80,78 20,78" fill="rgba(200,168,75,0.05)"/>
+      <circle cx="50" cy="38" r="6" fill="#c8a84b" opacity="0.9"/>
+    </svg>
+    <h1>DIAMANTE<br>RASTREADOR</h1>
+    <p class="subtitulo">Cada rosto tem uma história. Juntos, encontramos.</p>
+    <div class="divisor"><span></span><div class="losango"></div><span></span></div>
+  </section>
+  <section id="zona-busca">
+    <div id="busca-wrapper">
+      <span class="icone-busca">🔍</span>
+      <input type="text" id="campo-busca" placeholder="Buscar por nome, cidade ou características..." autocomplete="off" />
+      <button id="btn-avancada" title="Pesquisa avançada com IA">🌐 IA</button>
     </div>
-    <button id="btn-config" title="Configurações" onclick="abrirModalConfig()">⚙️</button>
-  </header>
-  
-  <main id="main">
-    <section id="hero">
-      <svg class="diamante-svg" viewBox="0 0 100 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <polygon points="50,2 98,28 80,78 20,78 2,28" fill="none" stroke="#c8a84b" stroke-width="2"/>
-        <polygon points="50,2 80,28 50,78 20,28" fill="rgba(200,168,75,0.08)" stroke="#c8a84b" stroke-width="1" stroke-dasharray="4,3"/>
-        <polygon points="2,28 98,28 80,78 20,78" fill="rgba(200,168,75,0.05)"/>
-        <circle cx="50" cy="38" r="6" fill="#c8a84b" opacity="0.9"/>
-      </svg>
-      <h1>DIAMANTE<br>RASTREADOR</h1>
-      <p class="subtitulo">Cada rosto tem uma história. Juntos, encontramos.</p>
-      <div class="divisor"><span></span><div class="losango"></div><span></span></div>
-    </section>
-    
-    <section id="zona-busca">
-      <div id="busca-wrapper">
-        <span class="icone-busca">🔍</span>
-        <input type="text" id="campo-busca" placeholder="Buscar por nome, cidade ou características..." autocomplete="off" />
-        <button id="btn-avancada" title="Pesquisa avançada com IA">🌐 IA</button>
-      </div>
-      <p id="contador-pesquisas">Pesquisas avançadas disponíveis: <span id="num-pesquisas">3</span></p>
-    </section>
-    
-    <div id="barra-acoes">
-      <p class="label-mural">Mural ativo · <strong id="total-registros">0</strong> registros</p>
-      <button id="btn-adicionar" onclick="abrirModalCadastro()">
-        <span class="mais">+</span> Adicionar
-      </button>
+    <p id="contador-pesquisas">Pesquisas avançadas disponíveis: <span id="num-pesquisas">3</span></p>
+  </section>
+  <div id="barra-acoes">
+    <p class="label-mural">Mural ativo · <strong id="total-registros">0</strong> registros</p>
+    <button id="btn-adicionar" onclick="abrirModalCadastro()">
+      <span class="mais">+</span> Adicionar
+    </button>
+  </div>
+  <section id="mural">
+    <div class="card-skeleton"></div>
+    <div class="card-skeleton"></div>
+    <div class="card-skeleton"></div>
+    <div class="card-skeleton"></div>
+    <div class="card-skeleton"></div>
+    <div class="card-skeleton"></div>
+  </section>
+</main>
+<footer id="footer">
+  <p class="logo-footer">◆ DIAMANTE RASTREADOR ◆</p>
+  <p>Plataforma de busca colaborativa · Juntos salvamos vidas</p>
+</footer>
+
+<!-- ═══ MODAL CONFIGURAÇÕES ═══ -->
+<div id="modal-config" class="modal-overlay" onclick="fecharModalFora(event,'modal-config')">
+  <div class="modal-box" style="position:relative;">
+    <button class="btn-fechar-modal" onclick="fecharModal('modal-config')">✕</button>
+    <div class="modal-alca"></div>    <h2 class="modal-titulo">⚙️ Configurações</h2>
+    <div class="modal-abas">
+      <button class="aba-btn ativo" onclick="trocarAba('publica')">Suporte</button>
+      <button class="aba-btn" onclick="trocarAba('docs')">Docs</button>
+      <button class="aba-btn" onclick="trocarAba('admin')">Admin 🔒</button>
     </div>
-    
-    <section id="mural">
-      <div class="card-skeleton"></div>
-      <div class="card-skeleton"></div>
-      <div class="card-skeleton"></div>
-      <div class="card-skeleton"></div>
-      <div class="card-skeleton"></div>
-      <div class="card-skeleton"></div>
-    </section>
-  </main>  
-  <footer id="footer">
-    <p class="logo-footer">◆ DIAMANTE RASTREADOR ◆</p>
-    <p>Plataforma de busca colaborativa · Juntos salvamos vidas</p>
-  </footer>
-  
-  <!-- ═══ MODAL CONFIGURAÇÕES ═══ -->
-  <div id="modal-config" class="modal-overlay" onclick="fecharModalFora(event,'modal-config')">
-    <div class="modal-box" style="position:relative;">
-      <button class="btn-fechar-modal" onclick="fecharModal('modal-config')">✕</button>
-      <div class="modal-alca"></div>
-      <h2 class="modal-titulo">⚙️ Configurações</h2>
-      
-      <div class="modal-abas">
-        <button class="aba-btn ativo" onclick="trocarAba('publica')">Suporte</button>
-        <button class="aba-btn" onclick="trocarAba('docs')">Docs</button>
-        <button class="aba-btn" onclick="trocarAba('admin')">Admin 🔒</button>
+    <div id="aba-publica" class="aba-painel ativo">
+      <div class="info-bloco">
+        <h3>📞 Contato de Suporte</h3>
+        <a id="link-suporte-whats" href="https://wa.me/5500000000000" target="_blank">
+          💬 Falar com o suporte via WhatsApp
+        </a>
       </div>
-      
-      <div id="aba-publica" class="aba-painel ativo">
-        <div class="info-bloco">
-          <h3>📞 Contato de Suporte</h3>
-          <a id="link-suporte-whats" href="https://wa.me/5500000000000" target="_blank">
-            💬 Falar com o suporte via WhatsApp
-          </a>
-        </div>
-        <div class="info-bloco">
-          <h3>ℹ️ Sobre o Projeto</h3>
-          <p id="texto-suporte">
-            O Diamante Rastreador é uma plataforma gratuita e colaborativa para ajudar na localização de pessoas desaparecidas.
+      <div class="info-bloco">
+        <h3>ℹ️ Sobre o Projeto</h3>
+        <p id="texto-suporte">
+          O Diamante Rastreador é uma plataforma gratuita e colaborativa para ajudar na localização de pessoas desaparecidas.
+        </p>
+      </div>
+    </div>
+    <div id="aba-docs" class="aba-painel">
+      <div class="info-bloco">
+        <h3>📋 Regras de Uso</h3>
+        <p id="texto-docs" style="font-size:13px;line-height:1.7;color:var(--branco);">
+          1. Cadastre apenas informações verídicas.<br>
+          2. Não utilize a plataforma para fins ilegais.<br>
+          3. Ao localizar a pessoa, marque como "Achado" imediatamente.<br>
+          4. Os dados são armazenados de forma segura.<br>
+          5. Em caso de emergência, ligue 190.
+        </p>
+      </div>
+    </div>
+    <div id="aba-admin" class="aba-painel">
+      <div id="admin-bloqueado" class="admin-lock">
+        <div class="icone-lock">🔐</div>
+        <p>Área restrita ao administrador.<br>Insira a senha para acessar.</p>
+        <input type="password" id="senha-admin" class="campo-input" placeholder="Senha de administrador" style="margin-bottom:12px;" />
+        <button class="btn-entrar" onclick="verificarSenhaAdmin()">Entrar</button>
+      </div>
+      <div id="admin-painel" style="display:none;">
+        <label class="campo-label">WhatsApp de Suporte (link)</label>
+        <input type="text" id="admin-whats" class="campo-input" placeholder="https://wa.me/55..." />
+        <label class="campo-label">Texto de Suporte Público</label>
+        <textarea id="admin-texto-suporte" class="campo-input" rows="3"></textarea>
+        <label class="campo-label">Documentação / Regras</label>
+        <textarea id="admin-docs" class="campo-input" rows="4"></textarea>
+
+        <!-- TOKEN GITHUB (mantido, mas não é mais usado) -->
+        <div style="margin-top:18px; background:rgba(192,57,43,0.08); border:1px solid rgba(192,57,43,0.3); border-radius:10px; padding:14px;">
+          <h3 style="font-size:12px;letter-spacing:2px;color:var(--perigo);text-transform:uppercase;margin-bottom:10px;">🔑 Token GitHub (Legado - não usado)</h3>          <p style="font-size:11px;color:var(--cinza);margin-bottom:10px;line-height:1.5;">
+            Este campo foi substituído pelo Firebase. Pode ser removido no futuro.
           </p>
+          <label class="campo-label" style="margin-top:0;">Token de Acesso (repo scope)</label>
+          <input type="password" id="admin-github-token" class="campo-input" placeholder="ghp_..." />
+          <p id="status-token" style="font-size:11px;margin-top:8px;display:none;"></p>
         </div>
-      </div>
-      
-      <div id="aba-docs" class="aba-painel">
-        <div class="info-bloco">
-          <h3>📋 Regras de Uso</h3>
-          <p id="texto-docs" style="font-size:13px;line-height:1.7;color:var(--branco);">
-            1. Cadastre apenas informações verídicas.<br>
-            2. Não utilize a plataforma para fins ilegais.<br>
-            3. Ao localizar a pessoa, marque como "Achado" imediatamente.<br>
-            4. Os dados são armazenados de forma segura.<br>
-            5. Em caso de emergência, ligue 190.
+
+        <div style="margin-top:18px; background:rgba(200,168,75,0.05); border:1px solid var(--borda); border-radius:10px; padding:14px;">
+          <h3 style="font-size:12px;letter-spacing:2px;color:var(--ouro);text-transform:uppercase;margin-bottom:10px;">🌐 IA — OpenRouter (Busca Web)</h3>
+          <p style="font-size:11px;color:var(--cinza);margin-bottom:10px;line-height:1.5;">
+            Usado no botão "🌐 IA" para busca inteligente no banco.<br>
+            Obtenha sua chave gratuita em <strong style="color:var(--ouro)">openrouter.ai</strong>
           </p>
+          <label class="campo-label" style="margin-top:0;">Chave API OpenRouter</label>
+          <input type="password" id="admin-openrouter-key" class="campo-input" placeholder="sk-or-v1-..." />
         </div>
-      </div>
-      
-      <div id="aba-admin" class="aba-painel">
-        <div id="admin-bloqueado" class="admin-lock">
-          <div class="icone-lock">🔐</div>          <p>Área restrita ao administrador.<br>Insira a senha para acessar.</p>
-          <input type="password" id="senha-admin" class="campo-input" placeholder="Senha de administrador" style="margin-bottom:12px;" />
-          <button class="btn-entrar" onclick="verificarSenhaAdmin()">Entrar</button>
+        <div style="margin-top:12px; background:rgba(200,168,75,0.05); border:1px solid var(--borda); border-radius:10px; padding:14px;">
+          <h3 style="font-size:12px;letter-spacing:2px;color:var(--ouro);text-transform:uppercase;margin-bottom:10px;">🤗 IA — HuggingFace Space (Banco Local)</h3>
+          <p style="font-size:11px;color:var(--cinza);margin-bottom:10px;line-height:1.5;">
+            Conecta ao seu Gradio Space no HuggingFace para busca no banco de dados.
+          </p>
+          <label class="campo-label" style="margin-top:0;">Token HuggingFace</label>
+          <input type="password" id="admin-hf-token" class="campo-input" placeholder="hf_..." />
+          <label class="campo-label">URL do Space (endpoint /run/predict)</label>
+          <input type="text" id="admin-hf-url" class="campo-input" placeholder="https://seu-usuario-seu-space.hf.space/run/predict" />
         </div>
-        
-        <div id="admin-painel" style="display:none;">
-          <label class="campo-label">WhatsApp de Suporte (link)</label>
-          <input type="text" id="admin-whats" class="campo-input" placeholder="https://wa.me/55..." />
-          
-          <label class="campo-label">Texto de Suporte Público</label>
-          <textarea id="admin-texto-suporte" class="campo-input" rows="3"></textarea>
-          
-          <label class="campo-label">Documentação / Regras</label>
-          <textarea id="admin-docs" class="campo-input" rows="4"></textarea>
-          
-          <!-- TOKEN GITHUB -->
-          <div style="margin-top:18px; background:rgba(192,57,43,0.08); border:1px solid rgba(192,57,43,0.3); border-radius:10px; padding:14px;">
-            <h3 style="font-size:12px;letter-spacing:2px;color:var(--perigo);text-transform:uppercase;margin-bottom:10px;">🔑 Token GitHub (Obrigatório)</h3>
-            <p style="font-size:11px;color:var(--cinza);margin-bottom:10px;line-height:1.5;">
-              Token de acesso pessoal do GitHub para sincronizar o banco de dados.<br>
-              Crie em: <strong style="color:var(--ouro)">github.com/settings/tokens</strong>
-            </p>
-            <label class="campo-label" style="margin-top:0;">Token de Acesso (repo scope)</label>
-            <input type="password" id="admin-github-token" class="campo-input" placeholder="ghp_..." />
-            <p id="status-token" style="font-size:11px;margin-top:8px;display:none;"></p>
-          </div>
-          
-          <div style="margin-top:18px; background:rgba(200,168,75,0.05); border:1px solid var(--borda); border-radius:10px; padding:14px;">
-            <h3 style="font-size:12px;letter-spacing:2px;color:var(--ouro);text-transform:uppercase;margin-bottom:10px;">🌐 IA — OpenRouter (Busca Web)</h3>
-            <p style="font-size:11px;color:var(--cinza);margin-bottom:10px;line-height:1.5;">
-              Usado no botão "🌐 IA" para busca inteligente no banco.<br>
-              Obtenha sua chave gratuita em <strong style="color:var(--ouro)">openrouter.ai</strong>
-            </p>
-            <label class="campo-label" style="margin-top:0;">Chave API OpenRouter</label>
-            <input type="password" id="admin-openrouter-key" class="campo-input" placeholder="sk-or-v1-..." />
-          </div>
-          
-          <div style="margin-top:12px; background:rgba(200,168,75,0.05); border:1px solid var(--borda); border-radius:10px; padding:14px;">
-            <h3 style="font-size:12px;letter-spacing:2px;color:var(--ouro);text-transform:uppercase;margin-bottom:10px;">🤗 IA — HuggingFace Space (Banco Local)</h3>
-            <p style="font-size:11px;color:var(--cinza);margin-bottom:10px;line-height:1.5;">
-              Conecta ao seu Gradio Space no HuggingFace para busca no banco de dados.
-            </p>
-            <label class="campo-label" style="margin-top:0;">Token HuggingFace</label>
-            <input type="password" id="admin-hf-token" class="campo-input" placeholder="hf_..." />
-            <label class="campo-label">URL do Space (endpoint /run/predict)</label>
-            <input type="text" id="admin-hf-url" class="campo-input" placeholder="https://seu-usuario-seu-space.hf.space/run/predict" />
-          </div>
-          
-          <label class="campo-label">Limite de Pesquisas Avançadas por Sessão</label>
-          <div class="limites-grid">            <button class="limite-btn" onclick="selecionarLimite(1)">1</button>
-            <button class="limite-btn" onclick="selecionarLimite(2)">2</button>
-            <button class="limite-btn ativo" onclick="selecionarLimite(3)">3</button>
-            <button class="limite-btn" onclick="selecionarLimite(4)">4</button>
-          </div>
-          
-          <div style="margin-top:18px; background:rgba(192,57,43,0.08); border:1px solid rgba(192,57,43,0.3); border-radius:10px; padding:14px;">
-            <h3 style="font-size:12px;letter-spacing:2px;color:var(--perigo);text-transform:uppercase;margin-bottom:10px;">🗑️ Apagar Postagens (Admin)</h3>
-            <p style="font-size:12px;color:var(--cinza);margin-bottom:12px;line-height:1.5;">
-              Ative o modo Admin para apagar qualquer postagem diretamente clicando no card no mural, ou abrindo o detalhe do registro.
-            </p>
-            <button onclick="ativarModoAdmin()" style="width:100%;background:var(--perigo);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:bold;cursor:pointer;font-family:var(--font-corpo);font-size:13px;letter-spacing:1px;">
-              🔴 ATIVAR MODO APAGAR
-            </button>
-            <button onclick="desativarModoAdmin()" style="width:100%;margin-top:8px;background:transparent;color:var(--cinza);border:1px solid var(--borda);padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;font-family:var(--font-corpo);font-size:12px;">
-              ✅ DESATIVAR MODO APAGAR
-            </button>
-          </div>
-          
-          <div class="admin-db-box" style="margin-top:18px;">
-            <h3>💾 Banco de Dados Local</h3>
-            <p style="font-size:11px;color:var(--cinza);margin-bottom:12px;line-height:1.5;">
-              Exporte o banco para seu celular como backup. Importe para restaurar ou injetar registros.
-            </p>
-            <div class="admin-db-actions">
-              <button class="btn-db exportar" onclick="IDB.exportarJSON()">📥 Exportar Banco</button>
-              <button class="btn-db importar" onclick="document.getElementById('input-importar-db').click()">📤 Importar Banco</button>
-            </div>
-            <input type="file" id="input-importar-db" accept=".json" style="display:none;" onchange="importarBancoDB(event)" />
-            <p id="status-db" style="font-size:11px;color:var(--sucesso);margin-top:10px;display:none;"></p>
-          </div>
-          
-          <button class="btn-salvar" onclick="salvarConfiguracoes()">◆ SALVAR CONFIGURAÇÕES</button>
-          <button onclick="sairAdmin()" style="width:100%;margin-top:10px;background:transparent;color:var(--cinza);border:none;padding:10px;font-family:var(--font-corpo);font-size:12px;cursor:pointer;letter-spacing:1px;">
-            Sair do Admin
+        <label class="campo-label">Limite de Pesquisas Avançadas por Sessão</label>
+        <div class="limites-grid">
+          <button class="limite-btn" onclick="selecionarLimite(1)">1</button>
+          <button class="limite-btn" onclick="selecionarLimite(2)">2</button>
+          <button class="limite-btn ativo" onclick="selecionarLimite(3)">3</button>
+          <button class="limite-btn" onclick="selecionarLimite(4)">4</button>
+        </div>
+        <div style="margin-top:18px; background:rgba(192,57,43,0.08); border:1px solid rgba(192,57,43,0.3); border-radius:10px; padding:14px;">
+          <h3 style="font-size:12px;letter-spacing:2px;color:var(--perigo);text-transform:uppercase;margin-bottom:10px;">🗑️ Apagar Postagens (Admin)</h3>
+          <p style="font-size:12px;color:var(--cinza);margin-bottom:12px;line-height:1.5;">
+            Ative o modo Admin para apagar qualquer postagem diretamente clicando no card no mural, ou abrindo o detalhe do registro.
+          </p>
+          <button onclick="ativarModoAdmin()" style="width:100%;background:var(--perigo);color:#fff;border:none;padding:12px;border-radius:8px;font-weight:bold;cursor:pointer;font-family:var(--font-corpo);font-size:13px;letter-spacing:1px;">
+            🔴 ATIVAR MODO APAGAR
+          </button>
+          <button onclick="desativarModoAdmin()" style="width:100%;margin-top:8px;background:transparent;color:var(--cinza);border:1px solid var(--borda);padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;font-family:var(--font-corpo);font-size:12px;">
+            ✅ DESATIVAR MODO APAGAR
           </button>
         </div>
+
+        <!-- 🔥 NOVO: 3 PASTAS DO ADMIN -->
+        <div style="margin-top:18px;">
+          <h3 style="font-size:12px;letter-spacing:2px;color:var(--ouro);text-transform:uppercase;margin-bottom:12px;">📂 Pastas de Registros</h3>          
+          <div class="admin-pasta-container">
+            <div class="admin-pasta-header" onclick="togglePasta('pasta-ativos')">
+              <h3>📁 Ativos <span class="pasta-contador" id="contador-ativos">0</span></h3>
+              <span class="pasta-seta">▼</span>
+            </div>
+            <div id="pasta-ativos" class="admin-pasta-conteudo"></div>
+          </div>
+
+          <div class="admin-pasta-container">
+            <div class="admin-pasta-header" onclick="togglePasta('pasta-achados')">
+              <h3>📁 Achados <span class="pasta-contador" id="contador-achados">0</span></h3>
+              <span class="pasta-seta">▼</span>
+            </div>
+            <div id="pasta-achados" class="admin-pasta-conteudo"></div>
+          </div>
+
+          <div class="admin-pasta-container">
+            <div class="admin-pasta-header" onclick="togglePasta('pasta-arquivo')">
+              <h3>📁 Arquivo <span class="pasta-contador" id="contador-arquivo">0</span></h3>
+              <span class="pasta-seta">▼</span>
+            </div>
+            <div id="pasta-arquivo" class="admin-pasta-conteudo"></div>
+          </div>
+        </div>
+
+        <div class="admin-db-box" style="margin-top:18px;">
+          <h3>💾 Banco de Dados Local</h3>
+          <p style="font-size:11px;color:var(--cinza);margin-bottom:12px;line-height:1.5;">
+            Exporte o banco para seu celular como backup. Importe para restaurar ou injetar registros.
+          </p>
+          <div class="admin-db-actions">
+            <button class="btn-db exportar" onclick="IDB.exportarJSON()">📥 Exportar Banco</button>
+            <button class="btn-db importar" onclick="document.getElementById('input-importar-db').click()">📤 Importar Banco</button>
+          </div>
+          <input type="file" id="input-importar-db" accept=".json" style="display:none;" onchange="importarBancoDB(event)" />
+          <p id="status-db" style="font-size:11px;color:var(--sucesso);margin-top:10px;display:none;"></p>
+        </div>
+        <button class="btn-salvar" onclick="salvarConfiguracoes()">◆ SALVAR CONFIGURAÇÕES</button>
+        <button onclick="sairAdmin()" style="width:100%;margin-top:10px;background:transparent;color:var(--cinza);border:none;padding:10px;font-family:var(--font-corpo);font-size:12px;cursor:pointer;letter-spacing:1px;">
+          Sair do Admin
+        </button>
       </div>
     </div>
   </div>
-  
-  <!-- ═══ MODAL CADASTRO ═══ -->
-  <div id="modal-cadastro" class="modal-overlay" onclick="fecharModalFora(event,'modal-cadastro')">
-    <div class="modal-box" style="position:relative;padding-bottom:50px;">
-      <button class="btn-fechar-modal" onclick="fecharModal('modal-cadastro')">✕</button>
-      <div class="modal-alca"></div>
-      <h2 class="modal-titulo">➕ Adicionar Procurado</h2>
-      
-      <div class="foto-upload" id="area-foto" onclick="document.getElementById('input-foto').click()">
-        <span class="icone-foto">📷</span>        <span>Toque para adicionar foto</span>
-      </div>
-      <input type="file" id="input-foto" accept="image/*" style="display:none;" onchange="previewFoto(event)" />
-      
-      <label class="campo-label">Nome Completo *</label>
-      <input type="text" id="cad-nome" class="campo-input" placeholder="Nome da pessoa..." />
-      
-      <label class="campo-label">Idade (opcional)</label>
-      <input type="number" id="cad-idade" class="campo-input" placeholder="Estimativa de idade..." />
-      
-      <label class="campo-label">Cidade do Desaparecimento *</label>
-      <input type="text" id="cad-cidade" class="campo-input" placeholder="Cidade, Estado..." />
-      
-      <label class="campo-label">Descrição (roupas, marcas, etc.)</label>
-      <textarea id="cad-desc" class="campo-input" rows="3" placeholder="Detalhes que possam ajudar na identificação..."></textarea>
-      
-      <label class="campo-label">Seu WhatsApp para Contato *</label>
-      <input type="tel" id="cad-whats" class="campo-input" placeholder="(00) 00000-0000" />
-      
-      <button class="btn-salvar" onclick="salvarCadastro()">◆ PUBLICAR NO MURAL</button>
+</div>
+
+<!-- ═══ MODAL CADASTRO ═══ -->
+<div id="modal-cadastro" class="modal-overlay" onclick="fecharModalFora(event,'modal-cadastro')">
+  <div class="modal-box" style="position:relative;padding-bottom:50px;">    <button class="btn-fechar-modal" onclick="fecharModal('modal-cadastro')">✕</button>
+    <div class="modal-alca"></div>
+    <h2 class="modal-titulo">➕ Adicionar Procurado</h2>
+    <div class="foto-upload" id="area-foto" onclick="document.getElementById('input-foto').click()">
+      <span class="icone-foto">📷</span>
+      <span>Toque para adicionar foto</span>
+    </div>
+    <input type="file" id="input-foto" accept="image/*" style="display:none;" onchange="previewFoto(event)" />
+    <label class="campo-label">Nome Completo *</label>
+    <input type="text" id="cad-nome" class="campo-input" placeholder="Nome da pessoa..." />
+    <label class="campo-label">Idade (opcional)</label>
+    <input type="number" id="cad-idade" class="campo-input" placeholder="Estimativa de idade..." />
+    <label class="campo-label">Cidade do Desaparecimento *</label>
+    <input type="text" id="cad-cidade" class="campo-input" placeholder="Cidade, Estado..." />
+    <label class="campo-label">Descrição (roupas, marcas, etc.)</label>
+    <textarea id="cad-desc" class="campo-input" rows="3" placeholder="Detalhes que possam ajudar na identificação..."></textarea>
+    <label class="campo-label">Seu WhatsApp para Contato *</label>
+    <input type="tel" id="cad-whats" class="campo-input" placeholder="(00) 00000-0000" />
+    <button class="btn-salvar" onclick="salvarCadastro()">◆ PUBLICAR NO MURAL</button>
+  </div>
+</div>
+
+<!-- ═══ MODAL DETALHE ═══ -->
+<div id="modal-detalhe" class="modal-overlay centralizado" onclick="fecharModalFora(event,'modal-detalhe')">
+  <div class="modal-box" style="position:relative;border-radius:20px;max-width:480px;margin:16px;">
+    <button class="btn-fechar-modal" onclick="fecharModal('modal-detalhe')">✕</button>
+    <div class="modal-alca"></div>
+    <div class="detalhe-foto-container">
+      <img id="detalhe-foto-img" src="" alt="" class="detalhe-foto" />
+      <button id="btn-compartilhar-foto" onclick="executarCompartilhar()">📤 Compartilhar</button>
+    </div>
+    <h2 id="detalhe-nome-txt" class="detalhe-nome"></h2>
+    <p id="detalhe-meta-txt" class="detalhe-meta"></p>
+    <p id="detalhe-desc-txt" class="detalhe-desc"></p>
+    <div class="detalhe-acoes">
+      <a id="detalhe-whats-btn" href="#" target="_blank" class="btn-whatsapp">💬 Entrar em Contato</a>
+      <button id="btn-marcar-achado" onclick="executarMarcarAchado()">✅ Marcar como Achado</button>
+      <button id="btn-apagar-admin" onclick="executarApagarAdmin()">🗑️ APAGAR (Admin)</button>
+      <button id="btn-apagar-postagem" onclick="executarApagarPostagem()">🗑️ Apagar Minha Postagem</button>
     </div>
   </div>
+</div>
+
+<script>
+let CONFIG = {
+  limitesPesquisas: 3,
+  whatsSuport: 'https://wa.me/5500000000000',
+  textoSuport: 'O Diamante Rastreador é uma plataforma gratuita para localização de desaparecidos.',
+  textoDocs: '1. Cadastre apenas informações verídicas.\n2. Marque como Achado quando localizar.\n3. Em emergências, ligue 190.',
+  openRouterKey: '',  hfToken: '',
+  urlHuggingFace: ''
+};
+
+// ═══ CORREÇÃO: Carrega as chaves salvas do localStorage ao iniciar ═══
+(function carregarChavesSalvas() {
+  const _orKey = localStorage.getItem('diamante_or_key');
+  if (_orKey) CONFIG.openRouterKey = atob(_orKey);
+  const _hfTok = localStorage.getItem('diamante_hf_token');
+  if (_hfTok) CONFIG.hfToken = atob(_hfTok);
+  const _hfUrl = localStorage.getItem('diamante_hf_url');
+  if (_hfUrl) CONFIG.urlHuggingFace = _hfUrl;
+  const _whats = localStorage.getItem('diamante_whats_suport');
+  if (_whats) CONFIG.whatsSuport = _whats;
+})();
+
+let pesquisasUsadas = 0;
+let limiteAdminSelecionado = 3;
+let _detalheAtualDados = null;
+
+function abrirModalConfig() { document.getElementById('modal-config').classList.add('ativo'); }
+function abrirModalCadastro() { document.getElementById('modal-cadastro').classList.add('ativo'); }
+function fecharModal(id) { document.getElementById(id).classList.remove('ativo'); }
+function fecharModalFora(e,id){ if (e.target === document.getElementById(id)) fecharModal(id); }
+
+function trocarAba(nome) {
+  const nomes = ['publica','docs','admin'];
+  document.querySelectorAll('.aba-btn').forEach((b,i) => b.classList.toggle('ativo', nomes[i] === nome));
+  document.querySelectorAll('.aba-painel').forEach(p => p.classList.remove('ativo'));
+  document.getElementById('aba-' + nome).classList.add('ativo');
   
-  <!-- ═══ MODAL DETALHE ═══ -->
-  <div id="modal-detalhe" class="modal-overlay centralizado" onclick="fecharModalFora(event,'modal-detalhe')">
-    <div class="modal-box" style="position:relative;border-radius:20px;max-width:480px;margin:16px;">
-      <button class="btn-fechar-modal" onclick="fecharModal('modal-detalhe')">✕</button>
-      <div class="modal-alca"></div>
-      
-      <div class="detalhe-foto-container">
-        <img id="detalhe-foto-img" src="" alt="" class="detalhe-foto" />
-        <button id="btn-compartilhar-foto" onclick="executarCompartilhar()">📤 Compartilhar</button>
-      </div>
-      
-      <h2 id="detalhe-nome-txt" class="detalhe-nome"></h2>
-      <p id="detalhe-meta-txt" class="detalhe-meta"></p>
-      <p id="detalhe-desc-txt" class="detalhe-desc"></p>
-      
-      <div class="detalhe-acoes">
-        <a id="detalhe-whats-btn" href="#" target="_blank" class="btn-whatsapp">💬 Entrar em Contato</a>
-        <button id="btn-marcar-achado" onclick="executarMarcarAchado()">✅ Marcar como Achado</button>
-        <button id="btn-apagar-admin" onclick="executarApagarAdmin()">🗑️ APAGAR (Admin)</button>
-        <button id="btn-apagar-postagem" onclick="executarApagarPostagem()">🗑️ Apagar Minha Postagem</button>
-      </div>
-    </div>
-  </div>
+  // 🔥 NOVO: Atualiza as pastas quando abrir o admin
+  if (nome === 'admin') {
+    setTimeout(renderizarPastasAdmin, 100);
+  }
+}
+
+async function verificarSenhaAdmin() {
+  const senha = document.getElementById('senha-admin').value;
+  const encoder = new TextEncoder();
+  const data = encoder.encode(senha);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   
-  <script>
-    let CONFIG = {
-      limitesPesquisas: 3,
-      whatsSuport: 'https://wa.me/5500000000000',
-      textoSuport: 'O Diamante Rastreador é uma plataforma gratuita para localização de desaparecidos.',
-      textoDocs: '1. Cadastre apenas informações verídicas.\n2. Marque como Achado quando localizar.\n3. Em emergências, ligue 190.',
-      openRouterKey: '',
-      hfToken: '',
-      urlHuggingFace: ''
-    };
+  if (hashHex === '60b50162c4d4861b60373ab3288b220feb7aa8ea551ac6de0b7179a041893061') {
+    document.getElementById('admin-bloqueado').style.display = 'none';
+    document.getElementById('admin-painel').style.display = 'block';
+    carregarCamposAdmin();
+    renderizarPastasAdmin();  } else {
+    const el = document.getElementById('senha-admin');
+    el.style.borderColor = 'var(--perigo)';
+    el.value = '';
+    el.placeholder = 'Senha incorreta!';
+    setTimeout(() => {
+      el.style.borderColor='';
+      el.placeholder='Senha de administrador';
+    }, 2000);
+  }
+}
 
-    // ═══ CORREÇÃO: Carrega as chaves salvas do localStorage ao iniciar ═══
-    (function carregarChavesSalvas() {
-      const _orKey = localStorage.getItem('diamante_or_key');
-      if (_orKey) CONFIG.openRouterKey = atob(_orKey);
+function carregarCamposAdmin() {
+  const whatsalvo = localStorage.getItem('diamante_whats_suport');
+  document.getElementById('admin-whats').value = whatsalvo || CONFIG.whatsSuport;
+  document.getElementById('admin-texto-suporte').value = CONFIG.textoSuport;
+  document.getElementById('admin-docs').value = CONFIG.textoDocs;
+  
+  const orKey = localStorage.getItem('diamante_or_key');
+  if (orKey) document.getElementById('admin-openrouter-key').value = atob(orKey);
+  const hfTok = localStorage.getItem('diamante_hf_token');
+  if (hfTok) document.getElementById('admin-hf-token').value = atob(hfTok);
+  const hfUrl = localStorage.getItem('diamante_hf_url');
+  if (hfUrl) document.getElementById('admin-hf-url').value = hfUrl;
+  
+  const tokenSalvo = localStorage.getItem('diamante_github_token');
+  if (tokenSalvo) {
+    document.getElementById('admin-github-token').value = atob(tokenSalvo);
+    const statusEl = document.getElementById('status-token');
+    statusEl.style.display = 'block';
+    statusEl.style.color = 'var(--sucesso)';
+    statusEl.textContent = '✅ Token configurado (legado)';
+  }
+}
 
-      const _hfTok = localStorage.getItem('diamante_hf_token');
-      if (_hfTok) CONFIG.hfToken = atob(_hfTok);
+function selecionarLimite(n) {
+  limiteAdminSelecionado = n;
+  document.querySelectorAll('.limite-btn').forEach((b,i) => b.classList.toggle('ativo', i+1 === n));
+}
 
-      const _hfUrl = localStorage.getItem('diamante_hf_url');
-      if (_hfUrl) CONFIG.urlHuggingFace = _hfUrl;
-    })();
-    
-    let pesquisasUsadas = 0;
-    let limiteAdminSelecionado = 3;
-    let _detalheAtualDados = null;
-    
-    function abrirModalConfig() {
-      document.getElementById('modal-config').classList.add('ativo');
-    }
-    
-    function abrirModalCadastro() {
-      document.getElementById('modal-cadastro').classList.add('ativo');
-    }
-    
-    function fecharModal(id) {
-      document.getElementById(id).classList.remove('ativo');
-    }
-    
-    function fecharModalFora(e,id){
-      if (e.target === document.getElementById(id)) fecharModal(id);
-    }
-    
-    function trocarAba(nome) {
-      const nomes = ['publica','docs','admin'];
-      document.querySelectorAll('.aba-btn').forEach((b,i) => b.classList.toggle('ativo', nomes[i] === nome));
-      document.querySelectorAll('.aba-painel').forEach(p => p.classList.remove('ativo'));
-      document.getElementById('aba-' + nome).classList.add('ativo');
-    }
-    
-    async function verificarSenhaAdmin() {
-      const senha = document.getElementById('senha-admin').value;
-      const encoder = new TextEncoder();
-      const data = encoder.encode(senha);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      
-      if (hashHex === '60b50162c4d4861b60373ab3288b220feb7aa8ea551ac6de0b7179a041893061') {
-        document.getElementById('admin-bloqueado').style.display = 'none';
-        document.getElementById('admin-painel').style.display = 'block';
-        carregarCamposAdmin();
-      } else {
-        const el = document.getElementById('senha-admin');
-        el.style.borderColor = 'var(--perigo)';
-        el.value = '';
-        el.placeholder = 'Senha incorreta!';
-        setTimeout(() => {
-          el.style.borderColor='';
-          el.placeholder='Senha de administrador';
-        }, 2000);
-      }
-    }
-    
-    function carregarCamposAdmin() {
-      document.getElementById('admin-whats').value = CONFIG.whatsSuport;
-      document.getElementById('admin-texto-suporte').value = CONFIG.textoSuport;
-      document.getElementById('admin-docs').value = CONFIG.textoDocs;
+function salvarConfiguracoes() {
+  CONFIG.whatsSuport = document.getElementById('admin-whats').value || CONFIG.whatsSuport;
+  CONFIG.textoSuport = document.getElementById('admin-texto-suporte').value || CONFIG.textoSuport;
+  CONFIG.textoDocs = document.getElementById('admin-docs').value || CONFIG.textoDocs;
+  CONFIG.openRouterKey = document.getElementById('admin-openrouter-key').value;
+  CONFIG.hfToken = document.getElementById('admin-hf-token').value;
+  CONFIG.urlHuggingFace = document.getElementById('admin-hf-url').value;
+  CONFIG.limitesPesquisas = limiteAdminSelecionado;
+  
+  if (CONFIG.openRouterKey) localStorage.setItem('diamante_or_key', btoa(CONFIG.openRouterKey));  if (CONFIG.hfToken) localStorage.setItem('diamante_hf_token', btoa(CONFIG.hfToken));
+  if (CONFIG.urlHuggingFace) localStorage.setItem('diamante_hf_url', CONFIG.urlHuggingFace);
+  if (CONFIG.whatsSuport) localStorage.setItem('diamante_whats_suport', CONFIG.whatsSuport);
+  
+  const tokenGitHub = document.getElementById('admin-github-token').value.trim();
+  if (tokenGitHub) {
+    localStorage.setItem('diamante_github_token', btoa(tokenGitHub));
+  }
+  
+  if (typeof CONFIG_IA !== 'undefined') {
+    CONFIG_IA.openRouterKey = CONFIG.openRouterKey;
+    CONFIG_IA.hfToken = CONFIG.hfToken;
+    CONFIG_IA.urlHuggingFace = CONFIG.urlHuggingFace;
+  }
+  
+  document.getElementById('texto-suporte').textContent = CONFIG.textoSuport;
+  document.getElementById('texto-docs').innerHTML = CONFIG.textoDocs.replace(/\n/g,'<br>');
+  document.getElementById('link-suporte-whats').href = CONFIG.whatsSuport;
+  document.getElementById('num-pesquisas').textContent = CONFIG.limitesPesquisas - pesquisasUsadas;
+  
+  fecharModal('modal-config');
+  
+  if (typeof mostrarToast === 'function') {
+    mostrarToast('✅ Configurações salvas!','sucesso');
+  } else {
+    alert('✅ Configurações salvas!');
+  }
+}
 
-      // ═══ CORREÇÃO: Carrega OpenRouter e HuggingFace do localStorage ═══
-      const orKey = localStorage.getItem('diamante_or_key');
-      if (orKey) document.getElementById('admin-openrouter-key').value = atob(orKey);
+function sairAdmin() {
+  document.getElementById('admin-painel').style.display = 'block';
+  document.getElementById('admin-bloqueado').style.display = 'block';
+  document.getElementById('admin-painel').style.display = 'none';
+  document.getElementById('senha-admin').value = '';
+  desativarModoAdmin();
+}
 
-      const hfTok = localStorage.getItem('diamante_hf_token');
-      if (hfTok) document.getElementById('admin-hf-token').value = atob(hfTok);
+function ativarModoAdmin() {
+  document.body.classList.add('admin-mode');
+  fecharModal('modal-config');
+  if (typeof mostrarToast === 'function') {
+    mostrarToast('🔴 Modo Admin ativo. Clique em um card para apagar.','aviso');
+  }
+}
 
-      const hfUrl = localStorage.getItem('diamante_hf_url');
-      if (hfUrl) document.getElementById('admin-hf-url').value = hfUrl;
+function desativarModoAdmin() {
+  document.body.classList.remove('admin-mode');
+  if (typeof mostrarToast === 'function') {
+    mostrarToast('✅ Modo Admin desativado.','sucesso');
+  }}
 
-      const tokenSalvo = localStorage.getItem('diamante_github_token');
-      if (tokenSalvo) {
-        document.getElementById('admin-github-token').value = atob(tokenSalvo);
-        const statusEl = document.getElementById('status-token');
-        statusEl.style.display = 'block';
-        statusEl.style.color = 'var(--sucesso)';
-        statusEl.textContent = '✅ Token configurado';
-      }
+document.getElementById('btn-avancada').addEventListener('click', () => {
+  const restantes = CONFIG.limitesPesquisas - pesquisasUsadas;
+  if (restantes <= 0) {
+    alert('Limite de pesquisas avançadas atingido para esta sessão.');
+    return;
+  }
+  const q = document.getElementById('campo-busca').value.trim();
+  if (!q) {
+    alert('Digite algo para pesquisar.');
+    return;
+  }
+  pesquisasUsadas++;
+  document.getElementById('num-pesquisas').textContent = CONFIG.limitesPesquisas - pesquisasUsadas;
+  document.dispatchEvent(new CustomEvent('buscaAvancada', {
+    detail: {
+      query: q,
+      openRouterKey: CONFIG.openRouterKey,
+      hfToken: CONFIG.hfToken,
+      hfUrl: CONFIG.urlHuggingFace
     }
-    
-    function selecionarLimite(n) {
-      limiteAdminSelecionado = n;
-      document.querySelectorAll('.limite-btn').forEach((b,i) => b.classList.toggle('ativo', i+1 === n));
-    }
-    
-    function salvarConfiguracoes() {
-      CONFIG.whatsSuport = document.getElementById('admin-whats').value || CONFIG.whatsSuport;
-      CONFIG.textoSuport = document.getElementById('admin-texto-suporte').value || CONFIG.textoSuport;
-      CONFIG.textoDocs = document.getElementById('admin-docs').value || CONFIG.textoDocs;
-      CONFIG.openRouterKey = document.getElementById('admin-openrouter-key').value;
-      CONFIG.hfToken = document.getElementById('admin-hf-token').value;
-      CONFIG.urlHuggingFace = document.getElementById('admin-hf-url').value;
-      CONFIG.limitesPesquisas = limiteAdminSelecionado;
+  }));
+});
 
-      // ═══ CORREÇÃO: Persiste OpenRouter e HuggingFace no localStorage ═══
-      if (CONFIG.openRouterKey) localStorage.setItem('diamante_or_key', btoa(CONFIG.openRouterKey));
-      if (CONFIG.hfToken) localStorage.setItem('diamante_hf_token', btoa(CONFIG.hfToken));
-      if (CONFIG.urlHuggingFace) localStorage.setItem('diamante_hf_url', CONFIG.urlHuggingFace);
-      
-      const tokenGitHub = document.getElementById('admin-github-token').value.trim();
-      if (tokenGitHub) {
-        localStorage.setItem('diamante_github_token', btoa(tokenGitHub));
-      }
-      
-      if (typeof CONFIG_IA !== 'undefined') {
-        CONFIG_IA.openRouterKey = CONFIG.openRouterKey;
-        CONFIG_IA.hfToken = CONFIG.hfToken;
-        CONFIG_IA.urlHuggingFace = CONFIG.urlHuggingFace;
-      }
-      
-      document.getElementById('texto-suporte').textContent = CONFIG.textoSuport;
-      document.getElementById('texto-docs').innerHTML = CONFIG.textoDocs.replace(/\n/g,'<br>');
-      document.getElementById('link-suporte-whats').href = CONFIG.whatsSuport;
-      document.getElementById('num-pesquisas').textContent = CONFIG.limitesPesquisas - pesquisasUsadas;
-      
-      fecharModal('modal-config');
-      
-      if (typeof mostrarToast === 'function') {
-        mostrarToast('✅ Configurações salvas!','sucesso');
-      } else {
-        alert('✅ Configurações salvas!');
-      }
+function previewFoto(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('area-foto').innerHTML = `<img src="${ev.target.result}" alt="preview">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+function salvarCadastro() {
+  const nome = document.getElementById('cad-nome').value.trim();
+  const cidade = document.getElementById('cad-cidade').value.trim();
+  const whats = document.getElementById('cad-whats').value.trim();
+  
+  if (!nome || !cidade || !whats) {
+    alert('Preencha os campos obrigatórios: Nome, Cidade e WhatsApp.');
+    return;
+  }
+  
+  const whatsNumeros = whats.replace(/\D/g, '');
+  if (whatsNumeros.length < 10 || whatsNumeros.length > 13) {
+    alert('WhatsApp inválido. Digite com DDD (ex: 11999990000).');
+    return;
+  }  
+  document.dispatchEvent(new CustomEvent('novoCadastro', {
+    detail: {
+      nome,
+      cidade,
+      whats: whatsNumeros,
+      idade: document.getElementById('cad-idade').value,
+      desc: document.getElementById('cad-desc').value,
+      fotoEl: document.getElementById('input-foto')
     }
-    
-    function sairAdmin() {
-      document.getElementById('admin-painel').style.display = 'block';
-      document.getElementById('admin-bloqueado').style.display = 'block';
-      document.getElementById('admin-painel').style.display = 'none';
-      document.getElementById('senha-admin').value = '';
-      desativarModoAdmin();
+  }));
+  
+  fecharModal('modal-cadastro');
+  ['cad-nome','cad-idade','cad-cidade','cad-desc','cad-whats'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('area-foto').innerHTML = '<span class="icone-foto">📷</span><span>Toque para adicionar foto</span>';
+  document.getElementById('input-foto').value = '';
+}
+
+function abrirDetalhe(dados) {
+  _detalheAtualDados = dados;
+  document.getElementById('detalhe-foto-img').src = dados.foto || '';
+  document.getElementById('detalhe-nome-txt').textContent = dados.nome || '';
+  document.getElementById('detalhe-meta-txt').textContent = `${dados.cidade || ''}${dados.idade ? ' · ' + dados.idade + ' anos' : ''}${dados.status === 'Achado' ? ' · ✅ ACHADO' : ''}`;
+  document.getElementById('detalhe-desc-txt').textContent = dados.desc || '';
+  
+  let whatsNum = String(dados.whats || '').replace(/\D/g,'');
+  if (!whatsNum.startsWith('55')) whatsNum = '55' + whatsNum;
+  document.getElementById('detalhe-whats-btn').href = 'https://wa.me/' + whatsNum;
+  
+  document.getElementById('modal-detalhe').classList.add('ativo');
+}
+
+function executarCompartilhar() {
+  if (!_detalheAtualDados) return;
+  if (typeof compartilharPostagem === 'function') compartilharPostagem(_detalheAtualDados);
+}
+
+function executarMarcarAchado() {
+  if (!_detalheAtualDados?.id) {
+    alert('Erro: ID não encontrado.');
+    return;
+  }
+  const whatsDigitado = prompt(
+    `Para confirmar que "${_detalheAtualDados.nome}" foi encontrado,\ndigite o WhatsApp cadastrado na postagem:`
+  );
+  if (whatsDigitado === null) return;
+  
+  const normalizar = s => String(s).replace(/\D/g, '');  if (normalizar(whatsDigitado) !== normalizar(_detalheAtualDados.whats)) {
+    alert('❌ WhatsApp incorreto. Só quem criou a postagem pode marcá-la como achada.');
+    return;
+  }
+  
+  if (typeof marcarComoAchado === 'function') marcarComoAchado(_detalheAtualDados.id);
+}
+
+function executarApagarPostagem() {
+  if (!_detalheAtualDados?.id) {
+    alert('Erro: ID não encontrado.');
+    return;
+  }
+  if (typeof apagarMinhaPostagem === 'function') apagarMinhaPostagem(_detalheAtualDados.id);
+}
+
+function executarApagarAdmin() {
+  if (!_detalheAtualDados?.id) {
+    alert('Erro: ID não encontrado.');
+    return;
+  }
+  if (!document.body.classList.contains('admin-mode')) {
+    alert('Ative o Modo Admin nas configurações primeiro.');
+    return;
+  }
+  if (!confirm(`[ADMIN] Apagar a postagem de "${_detalheAtualDados.nome}"? Ação irreversível.`)) return;
+  
+  const id = _detalheAtualDados.id;
+  fecharModal('modal-detalhe');
+  document.dispatchEvent(new CustomEvent('deletarRegistro', { detail: { id: String(id) } }));
+}
+
+async function importarBancoDB(e) {
+  const arquivo = e.target.files[0];
+  if (!arquivo) return;
+  
+  const statusEl = document.getElementById('status-db');
+  statusEl.style.display = 'block';
+  statusEl.textContent = '⏳ Importando...';
+  
+  try {
+    const dados = await IDB.importarJSON(arquivo);
+    if (typeof listaFotosDesaparecidos !== 'undefined') {
+      listaFotosDesaparecidos.length = 0;
+      dados.forEach(i => listaFotosDesaparecidos.push(i));
+      if (typeof renderizarMural === 'function') renderizarMural();
     }
+    statusEl.style.color = 'var(--sucesso)';
+    statusEl.textContent = `✅ ${dados.length} registros importados com sucesso!`;
+    document.dispatchEvent(new CustomEvent('muralCarregado', { detail: { total: dados.length } }));    renderizarPastasAdmin();
+  } catch (err) {
+    statusEl.style.color = 'var(--perigo)';
+    statusEl.textContent = '❌ Erro ao importar. Verifique o arquivo JSON.';
+    console.error(err);
+  }
+  e.target.value = '';
+}
+
+document.addEventListener('muralCarregado', e => {
+  document.querySelectorAll('.card-skeleton').forEach(s => s.remove());
+  document.getElementById('total-registros').textContent = e.detail?.total || 0;
+  renderizarPastasAdmin();
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') ['modal-config','modal-cadastro','modal-detalhe'].forEach(fecharModal);
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(() => console.log('✅ SW ativo'))
+      .catch(err => console.log('SW:', err));
+  });
+}
+
+// ═══ 🔥 NOVO: FUNÇÕES DAS PASTAS ADMIN ═══
+function togglePasta(id) {
+  const conteudo = document.getElementById(id);
+  const header = conteudo.previousElementSibling;
+  conteudo.classList.toggle('aberto');
+  header.classList.toggle('aberto');
+}
+
+function renderizarPastasAdmin() {
+  if (typeof listaFotosDesaparecidos === 'undefined') return;
+  
+  const ativos = listaFotosDesaparecidos.filter(item => item.status !== 'Achado');
+  const achados = listaFotosDesaparecidos.filter(item => item.status === 'Achado');
+  const arquivo = []; // Reservado para futuro uso
+  
+  renderizarPasta('pasta-ativos', 'contador-ativos', ativos, 'Nenhum registro ativo');
+  renderizarPasta('pasta-achados', 'contador-achados', achados, 'Nenhum registro achado');
+  renderizarPasta('pasta-arquivo', 'contador-arquivo', arquivo, 'Arquivo vazio');
+}
+
+function renderizarPasta(pastaId, contadorId, lista, mensagemVazio) {
+  const pasta = document.getElementById(pastaId);
+  const contador = document.getElementById(contadorId);  
+  if (!pasta || !contador) return;
+  
+  contador.textContent = lista.length;
+  
+  if (lista.length === 0) {
+    pasta.innerHTML = `<div class="admin-pasta-vazio">${mensagemVazio}</div>`;
+    return;
+  }
+  
+  pasta.innerHTML = lista.map(item => {
+    let whatsNum = String(item.whatsapp || item.whats || '').replace(/\D/g, '');
+    if (!whatsNum.startsWith('55')) whatsNum = '55' + whatsNum;
+    const linkWhats = `https://wa.me/${whatsNum}`;
     
-    function ativarModoAdmin() {
-      document.body.classList.add('admin-mode');
-      fecharModal('modal-config');
-      if (typeof mostrarToast === 'function') {
-        mostrarToast('🔴 Modo Admin ativo. Clique em um card para apagar.','aviso');
-      }
-    }
-    
-    function desativarModoAdmin() {
-      document.body.classList.remove('admin-mode');
-      if (typeof mostrarToast === 'function') {
-        mostrarToast('✅ Modo Admin desativado.','sucesso');
-      }
-    }
-    
-    document.getElementById('btn-avancada').addEventListener('click', () => {
-      const restantes = CONFIG.limitesPesquisas - pesquisasUsadas;
-      if (restantes <= 0) {
-        alert('Limite de pesquisas avançadas atingido para esta sessão.');
-        return;
-      }
-      
-      const q = document.getElementById('campo-busca').value.trim();
-      if (!q) {
-        alert('Digite algo para pesquisar.');
-        return;
-      }
-      
-      pesquisasUsadas++;
-      document.getElementById('num-pesquisas').textContent = CONFIG.limitesPesquisas - pesquisasUsadas;
-      
-      document.dispatchEvent(new CustomEvent('buscaAvancada', {
-        detail: {
-          query: q,
-          openRouterKey: CONFIG.openRouterKey,
-          hfToken: CONFIG.hfToken,
-          hfUrl: CONFIG.urlHuggingFace
-        }
-      }));
-    });
-    
-    function previewFoto(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        document.getElementById('area-foto').innerHTML = `<img src="${ev.target.result}" alt="preview">`;
-      };
-      reader.readAsDataURL(file);
-    }
-    
-    function salvarCadastro() {
-      const nome = document.getElementById('cad-nome').value.trim();
-      const cidade = document.getElementById('cad-cidade').value.trim();
-      const whats = document.getElementById('cad-whats').value.trim();
-      
-      if (!nome || !cidade || !whats) {
-        alert('Preencha os campos obrigatórios: Nome, Cidade e WhatsApp.');
-        return;
-      }
-      
-      const whatsNumeros = whats.replace(/\D/g, '');
-      if (whatsNumeros.length < 10 || whatsNumeros.length > 13) {
-        alert('WhatsApp inválido. Digite com DDD (ex: 11999990000).');
-        return;
-      }
-      
-      document.dispatchEvent(new CustomEvent('novoCadastro', {
-        detail: {
-          nome,
-          cidade,
-          whats: whatsNumeros,
-          idade: document.getElementById('cad-idade').value,
-          desc: document.getElementById('cad-desc').value,
-          fotoEl: document.getElementById('input-foto')
-        }
-      }));
-      
-      fecharModal('modal-cadastro');
-      
-      ['cad-nome','cad-idade','cad-cidade','cad-desc','cad-whats'].forEach(id => {
-        document.getElementById(id).value = '';
-      });
-      
-      document.getElementById('area-foto').innerHTML = '<span class="icone-foto">📷</span><span>Toque para adicionar foto</span>';
-      document.getElementById('input-foto').value = '';
-    }
-    
-    function abrirDetalhe(dados) {
-      _detalheAtualDados = dados;
-      document.getElementById('detalhe-foto-img').src = dados.foto || '';
-      document.getElementById('detalhe-nome-txt').textContent = dados.nome || '';
-      document.getElementById('detalhe-meta-txt').textContent = `${dados.cidade || ''}${dados.idade ? ' · ' + dados.idade + ' anos' : ''}${dados.status === 'Achado' ? ' · ✅ ACHADO' : ''}`;
-      document.getElementById('detalhe-desc-txt').textContent = dados.desc || '';
-      
-      let whatsNum = String(dados.whats || '').replace(/\D/g,'');
-      if (!whatsNum.startsWith('55')) whatsNum = '55' + whatsNum;
-      document.getElementById('detalhe-whats-btn').href = 'https://wa.me/' + whatsNum;
-      
-      document.getElementById('modal-detalhe').classList.add('ativo');
-    }
-    
-    function executarCompartilhar() {
-      if (!_detalheAtualDados) return;
-      if (typeof compartilharPostagem === 'function') compartilharPostagem(_detalheAtualDados);
-    }
-    
-    function executarMarcarAchado() {
-      if (!_detalheAtualDados?.id) {
-        alert('Erro: ID não encontrado.');
-        return;
-      }
-      
-      const whatsDigitado = prompt(
-        `Para confirmar que "${_detalheAtualDados.nome}" foi encontrado,\ndigite o WhatsApp cadastrado na postagem:`
-      );
-      
-      if (whatsDigitado === null) return;
-      
-      const normalizar = s => String(s).replace(/\D/g, '');
-      if (normalizar(whatsDigitado) !== normalizar(_detalheAtualDados.whats)) {
-        alert('❌ WhatsApp incorreto. Só quem criou a postagem pode marcá-la como achada.');
-        return;
-      }
-      
-      if (typeof marcarComoAchado === 'function') marcarComoAchado(_detalheAtualDados.id);
-    }
-    
-    function executarApagarPostagem() {
-      if (!_detalheAtualDados?.id) {
-        alert('Erro: ID não encontrado.');
-        return;
-      }
-      if (typeof apagarMinhaPostagem === 'function') apagarMinhaPostagem(_detalheAtualDados.id);
-    }
-    
-    function executarApagarAdmin() {
-      if (!_detalheAtualDados?.id) {
-        alert('Erro: ID não encontrado.');
-        return;
-      }
-      
-      if (!document.body.classList.contains('admin-mode')) {
-        alert('Ative o Modo Admin nas configurações primeiro.');
-        return;
-      }
-      
-      if (!confirm(`[ADMIN] Apagar a postagem de "${_detalheAtualDados.nome}"? Ação irreversível.`)) return;
-      
-      const id = _detalheAtualDados.id;
-      fecharModal('modal-detalhe');
-      
-      document.dispatchEvent(new CustomEvent('deletarRegistro', {
-        detail: { id: String(id) }
-      }));
-    }
-    
-    async function importarBancoDB(e) {
-      const arquivo = e.target.files[0];
-      if (!arquivo) return;
-      
-      const statusEl = document.getElementById('status-db');
-      statusEl.style.display = 'block';
-      statusEl.textContent = '⏳ Importando...';
-      
-      try {
-        const dados = await IDB.importarJSON(arquivo);
-        
-        if (typeof listaFotosDesaparecidos !== 'undefined') {
-          listaFotosDesaparecidos.length = 0;
-          dados.forEach(i => listaFotosDesaparecidos.push(i));
-          if (typeof renderizarMural === 'function') renderizarMural();
-        }
-        
-        statusEl.style.color = 'var(--sucesso)';
-        statusEl.textContent = `✅ ${dados.length} registros importados com sucesso!`;
-        
-        document.dispatchEvent(new CustomEvent('muralCarregado', {
-          detail: { total: dados.length }
-        }));
-      } catch (err) {
-        statusEl.style.color = 'var(--perigo)';
-        statusEl.textContent = '❌ Erro ao importar. Verifique o arquivo JSON.';
-        console.error(err);
-      }
-      
-      e.target.value = '';
-    }
-    
-    document.addEventListener('muralCarregado', e => {
-      document.querySelectorAll('.card-skeleton').forEach(s => s.remove());
-      document.getElementById('total-registros').textContent = e.detail?.total || 0;
-    });
-    
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') ['modal-config','modal-cadastro','modal-detalhe'].forEach(fecharModal);
-    });
-    
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(() => console.log('✅ SW ativo'))
-          .catch(err => console.log('SW:', err));
-      });
-    }
-  </script>
+    return `
+      <div class="admin-registro-item">
+        <img src="${item.fotoBase64 || item.foto || ''}" alt="${item.nome || ''}" />
+        <div class="admin-registro-info">
+          <div class="nome">${item.nome || 'Sem nome'}</div>
+          <div class="meta">${item.idade || '?'} anos · ${item.cidade || 'Sem cidade'}</div>
+        </div>
+        <a href="${linkWhats}" target="_blank" class="admin-registro-whats">💬 WhatsApp</a>
+      </div>
+    `;
+  }).join('');
+}
+</script>
 </body>
 </html>
